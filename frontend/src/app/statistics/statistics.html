@@ -1,0 +1,72 @@
+<div class="stats-page">
+
+  <header class="stats-header">
+    <h1 class="stats-title">Statistics</h1>
+    <span class="stats-subtitle">Your reading activity overview</span>
+  </header>
+
+  <!-- Summary cards -->
+  <section class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-card__icon streak-icon">🔥</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">—</span>
+        <span class="stat-card__label">Day streak</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon time-icon">⏱</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">—</span>
+        <span class="stat-card__label">Total read time</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon avg-icon">📈</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">—</span>
+        <span class="stat-card__label">Daily average</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon books-icon">📚</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">—</span>
+        <span class="stat-card__label">Books completed</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weekly chart -->
+  <section class="stats-section">
+    <h2 class="section-title">This week</h2>
+    <div class="chart-container">
+      <div class="chart-placeholder">
+        <div class="chart-bars">
+          @for (day of weekDays; track day.label) {
+            <div class="chart-bar-wrap">
+              <div class="chart-bar" [style.height.%]="day.heightPct"></div>
+              <span class="chart-bar__label">{{ day.label }}</span>
+            </div>
+          }
+        </div>
+        <div class="chart-empty-note">Connect to backend to load real data</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent sessions -->
+  <section class="stats-section">
+    <h2 class="section-title">Recent sessions</h2>
+    <div class="sessions-list">
+      <div class="session-empty">
+        <span class="session-empty__icon">📖</span>
+        <p>No sessions recorded yet.<br>Start tracking your reading to see history here.</p>
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -3,6 +3,7 @@ import { Libary } from './libary/libary';
 import { YourLibary } from './your-libary/your-libary';
 import { Tracker } from './tracker/tracker';
 import { Statistics } from './statistics/statistics';
+import { Profile } from './profile/profile';
 
 export const routes: Routes = [
   { path: '',            redirectTo: 'library', pathMatch: 'full' },
@@ -10,4 +11,5 @@ export const routes: Routes = [
   { path: 'my-library', component: YourLibary },
   { path: 'tracker',    component: Tracker },
   { path: 'statistics', component: Statistics },
+  { path: 'profile', component: Profile },
 ];

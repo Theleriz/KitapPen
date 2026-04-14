@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -115,3 +116,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MinIO / S3 Storage
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+AWS_ACCESS_KEY_ID       = os.environ.get('MINIO_ROOT_USER', 'minioadmin')
+AWS_SECRET_ACCESS_KEY   = os.environ.get('MINIO_ROOT_PASSWORD', 'minioadmin')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('MINIO_BUCKET', 'booktracker')
+AWS_S3_ENDPOINT_URL     = os.environ.get('MINIO_ENDPOINT', 'http://minio:9000')
+AWS_S3_ADDRESSING_STYLE = 'path'
+AWS_DEFAULT_ACL         = None

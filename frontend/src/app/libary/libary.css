@@ -1,0 +1,219 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--color-bg-subtle);
+}
+
+/* ── Page layout ─────────────────────────────── */
+.library-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+/* ── Header ──────────────────────────────────── */
+.library-header {
+  margin-bottom: 32px;
+}
+
+.library-header__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.library-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.library-subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ── Search bar ──────────────────────────────── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  width: 280px;
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within {
+  border-color: var(--color-accent);
+}
+
+.search-bar__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.search-bar__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: transparent;
+  padding: 10px 0;
+}
+
+.search-bar__input::placeholder {
+  color: var(--color-text-faint);
+}
+
+/* ── Books grid ──────────────────────────────── */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* ── Book card ───────────────────────────────── */
+.book-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--color-card-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.book-card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
+}
+
+.book-card__cover {
+  height: 160px;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.book-card__cover-letter {
+  font-size: 56px;
+  font-weight: 700;
+  color: #4f46e5;
+  opacity: 0.5;
+  line-height: 1;
+  user-select: none;
+}
+
+.book-card__body {
+  padding: 14px 14px 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.book-card__author {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.book-card__meta {
+  margin-top: 6px;
+}
+
+.book-card__pages {
+  font-size: 11px;
+  color: var(--color-text-faint);
+}
+
+.book-card__actions {
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-read {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-read:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn-add {
+  width: 100%;
+  padding: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-add:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── Empty state ─────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.empty-state__icon {
+  font-size: 40px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 560px) {
+  .library-header__top {
+    flex-direction: column;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+}

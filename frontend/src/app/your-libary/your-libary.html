@@ -1,0 +1,67 @@
+<div class="your-library-page">
+
+  <header class="your-library-header">
+    <div>
+      <h1 class="your-library-title">My Library</h1>
+      <span class="your-library-subtitle">{{ books.length }} book{{ books.length !== 1 ? 's' : '' }} in your collection</span>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      @for (tab of tabs; track tab.value) {
+        <button
+          class="filter-tab"
+          [class.filter-tab--active]="activeTab === tab.value"
+          (click)="activeTab = tab.value"
+        >{{ tab.label }}</button>
+      }
+    </div>
+  </header>
+
+  <!-- Book list -->
+  @if (filteredBooks.length > 0) {
+    <div class="book-list">
+      @for (book of filteredBooks; track book.id) {
+        <div class="book-row">
+
+          <div class="book-row__cover">
+            <span class="book-row__cover-letter">{{ book.title[0] }}</span>
+          </div>
+
+          <div class="book-row__info">
+            <h3 class="book-row__title">{{ book.title }}</h3>
+            <p class="book-row__author">{{ book.author }}</p>
+            <div class="book-row__progress-wrap">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="book.progressPct"></div>
+              </div>
+              <span class="progress-label">{{ book.progressPct }}%</span>
+            </div>
+          </div>
+
+          <div class="book-row__right">
+            <span class="status-badge" [class]="'status-badge--' + book.status">
+              {{ statusLabel(book.status) }}
+            </span>
+            <button class="btn-continue">
+              {{ book.progressPct === 0 ? 'Start reading' : 'Continue' }}
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+  @if (filteredBooks.length === 0) {
+    <div class="empty-state">
+      <span class="empty-state__icon">🗂️</span>
+      @if (activeTab === 'all') {
+        <p>Your library is empty.<br>Go to the <a href="/library">Library</a> to add books.</p>
+      } @else {
+        <p>No books with this status.</p>
+      }
+    </div>
+  }
+
+</div>

@@ -1,0 +1,91 @@
+<div class="tracker-page">
+
+  <header class="tracker-header">
+    <h1 class="tracker-title">Track Reading</h1>
+    <span class="tracker-subtitle">Webcam-based reading session tracker</span>
+  </header>
+
+  <div class="tracker-layout">
+
+    <!-- Left: camera + status -->
+    <div class="tracker-camera-col">
+
+      <div class="camera-card" [class.camera-card--active]="isTracking">
+        <!-- Live video feed -->
+        <video #videoEl class="camera-feed" autoplay muted playsinline
+               [class.camera-feed--hidden]="!isTracking"></video>
+
+        <!-- Idle placeholder -->
+        @if (!isTracking) {
+          <div class="camera-placeholder">
+            <span class="camera-placeholder__icon">📷</span>
+            <p>Camera will activate<br>when session starts</p>
+          </div>
+        }
+
+        <!-- CV status badge (shown while tracking) -->
+        @if (isTracking) {
+          <div class="cv-badge" [class.cv-badge--reading]="isReading">
+            <span class="cv-badge__dot"></span>
+            <span class="cv-badge__text">{{ isReading ? 'Reading detected' : 'Not reading' }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Confidence bar -->
+      @if (isTracking) {
+        <div class="confidence-row">
+          <span class="confidence-label">Confidence</span>
+          <div class="confidence-bar">
+            <div class="confidence-fill" [style.width.%]="confidence * 100"></div>
+          </div>
+          <span class="confidence-value">{{ (confidence * 100).toFixed(0) }}%</span>
+        </div>
+      }
+
+    </div>
+
+    <!-- Right: controls -->
+    <div class="tracker-controls-col">
+
+      <!-- Book selector -->
+      <div class="control-block">
+        <label class="control-label" for="book-select">Book</label>
+        <select id="book-select" class="control-select" [disabled]="isTracking">
+          <option value="" disabled selected>Select a book…</option>
+          <!-- options loaded from API -->
+        </select>
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-block">
+        <span class="timer-display">{{ formattedTime }}</span>
+        <span class="timer-label">session time</span>
+      </div>
+
+      <!-- Session status -->
+      <div class="session-status" [class.session-status--active]="isTracking">
+        <span class="session-status__dot"></span>
+        <span class="session-status__text">
+          {{ isTracking ? 'Session active' : 'No active session' }}
+        </span>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        @if (!isTracking) {
+          <button class="btn btn--primary" (click)="startSession()">
+            Start session
+          </button>
+        }
+        @if (isTracking) {
+          <button class="btn btn--danger" (click)="stopSession()">
+            Stop session
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+
+</div>

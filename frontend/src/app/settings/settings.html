@@ -1,0 +1,92 @@
+<div class="settings-page">
+
+    <header class="settings-header">
+      <h1 class="settings-title">Settings</h1>
+      <span class="settings-subtitle">Customize your reading experience</span>
+    </header>
+  
+    <div class="settings-layout">
+  
+      <div class="settings-card">
+        <h3 class="card-title">Preferences</h3>
+  
+        <div class="setting-row">
+          <div class="setting-row__text">
+            <span class="setting-row__title">Dark mode</span>
+            <span class="setting-row__desc">Switch between light and dark interface</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.darkMode" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+  
+        <div class="setting-row">
+          <div class="setting-row__text">
+            <span class="setting-row__title">Email notifications</span>
+            <span class="setting-row__desc">Receive updates about account activity</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.emailNotifications" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+  
+        <div class="setting-row">
+          <div class="setting-row__text">
+            <span class="setting-row__title">Reading reminders</span>
+            <span class="setting-row__desc">Get reminders for your daily reading goal</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.readingReminders" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+  
+        <div class="setting-row">
+          <div class="setting-row__text">
+            <span class="setting-row__title">Autostart tracking</span>
+            <span class="setting-row__desc">Start reading tracker faster for sessions</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.autoplayTracking" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+  
+      <div class="settings-card">
+        <h3 class="card-title">General</h3>
+  
+        <div class="form-grid">
+          <div class="form-block">
+            <label class="form-label" for="language">Language</label>
+            <select
+              id="language"
+              class="form-select"
+              [(ngModel)]="settings.language"
+            >
+              <option>English</option>
+              <option>Russian</option>
+              <option>Kazakh</option>
+            </select>
+          </div>
+  
+          <div class="form-block">
+            <label class="form-label" for="goal">Daily reading goal (minutes)</label>
+            <input
+              id="goal"
+              type="number"
+              class="form-input"
+              [(ngModel)]="settings.dailyGoal"
+            />
+          </div>
+        </div>
+  
+        <div class="card-actions">
+          <button class="btn-save" (click)="saveSettings()">Save settings</button>
+        </div>
+      </div>
+  
+    </div>
+  </div>

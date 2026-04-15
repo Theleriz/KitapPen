@@ -1,0 +1,109 @@
+<div class="profile-page">
+
+    <header class="profile-header">
+      <h1 class="profile-title">Profile</h1>
+      <span class="profile-subtitle">Manage your personal information</span>
+    </header>
+  
+    <div class="profile-layout">
+  
+      <!-- Left column -->
+      <div class="profile-summary-card">
+        <div class="profile-avatar">
+          {{ profile.name[0] }}
+        </div>
+  
+        <h2 class="profile-name">{{ profile.name }}</h2>
+        <p class="profile-email">{{ profile.email }}</p>
+  
+        <div class="profile-meta">
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Favorite genre</span>
+            <span class="profile-meta__value">{{ profile.favoriteGenre }}</span>
+          </div>
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Joined</span>
+            <span class="profile-meta__value">{{ profile.joinedDate }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Right column -->
+      <div class="profile-main-col">
+  
+        <div class="profile-card">
+          <h3 class="card-title">Personal info</h3>
+  
+          <div class="form-grid">
+            <div class="form-block">
+              <label class="form-label" for="name">Full name</label>
+              <input
+                id="name"
+                type="text"
+                class="form-input"
+                [(ngModel)]="profile.name"
+              />
+            </div>
+  
+            <div class="form-block">
+              <label class="form-label" for="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                class="form-input"
+                [(ngModel)]="profile.email"
+              />
+            </div>
+  
+            <div class="form-block form-block--full">
+              <label class="form-label" for="bio">Bio</label>
+              <textarea
+                id="bio"
+                class="form-textarea"
+                rows="4"
+                [(ngModel)]="profile.bio"
+              ></textarea>
+            </div>
+  
+            <div class="form-block">
+              <label class="form-label" for="genre">Favorite genre</label>
+              <select
+                id="genre"
+                class="form-select"
+                [(ngModel)]="profile.favoriteGenre"
+              >
+                <option>Fiction</option>
+                <option>Fantasy</option>
+                <option>Science Fiction</option>
+                <option>Romance</option>
+                <option>Biography</option>
+                <option>Productivity</option>
+              </select>
+            </div>
+          </div>
+  
+          <div class="card-actions">
+            <button class="btn-save" (click)="saveProfile()">Save changes</button>
+          </div>
+        </div>
+  
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-card__value">{{ stats.booksRead }}</span>
+            <span class="stat-card__label">Books read</span>
+          </div>
+  
+          <div class="stat-card">
+            <span class="stat-card__value">{{ stats.hoursTracked }}</span>
+            <span class="stat-card__label">Hours tracked</span>
+          </div>
+  
+          <div class="stat-card">
+            <span class="stat-card__value">{{ stats.currentStreak }}</span>
+            <span class="stat-card__label">Day streak</span>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>

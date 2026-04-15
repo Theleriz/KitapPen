@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -119,33 +120,21 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Media files (uploaded PDFs)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+# MinIO / S3 Storage
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
 
-# JWT settings
-from datetime import timedelta
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-}
-
-# MinIO settings (configure as needed)
-MINIO_ENDPOINT = 'localhost:9000'
-MINIO_ACCESS_KEY = 'minioadmin'
-MINIO_SECRET_KEY = 'minioadmin'
-MINIO_BUCKET_NAME = 'books'
-MINIO_SECURE = False
+AWS_ACCESS_KEY_ID       = os.environ.get('MINIO_ROOT_USER', 'minioadmin')
+AWS_SECRET_ACCESS_KEY   = os.environ.get('MINIO_ROOT_PASSWORD', 'minioadmin')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('MINIO_BUCKET', 'booktracker')
+AWS_S3_ENDPOINT_URL     = os.environ.get('MINIO_ENDPOINT', 'http://minio:9000')
+AWS_S3_ADDRESSING_STYLE = 'path'
+AWS_DEFAULT_ACL         = None

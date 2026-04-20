@@ -5,13 +5,19 @@ import { Tracker } from './tracker/tracker';
 import { Statistics } from './statistics/statistics';
 import { Profile } from './profile/profile';
 import { Settings } from './settings/settings';
+import { Login } from './login/login';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
-  { path: '',            redirectTo: 'library', pathMatch: 'full' },
-  { path: 'library',    component: Libary },
-  { path: 'my-library', component: YourLibary },
-  { path: 'tracker',    component: Tracker },
-  { path: 'statistics', component: Statistics },
-  { path: 'profile', component: Profile },
-  { path: 'settings', component: Settings },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: Login },
+
+  { path: 'library', component: Libary, canActivate: [authGuard] },
+  { path: 'my-library', component: YourLibary, canActivate: [authGuard] },
+  { path: 'tracker', component: Tracker, canActivate: [authGuard] },
+  { path: 'statistics', component: Statistics, canActivate: [authGuard] },
+  { path: 'profile', component: Profile, canActivate: [authGuard] },
+  { path: 'settings', component: Settings, canActivate: [authGuard] },
+
+  { path: '**', redirectTo: 'login' },
 ];

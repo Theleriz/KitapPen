@@ -3,25 +3,27 @@
   <header class="your-library-header">
     <div>
       <h1 class="your-library-title">My Library</h1>
-      <span class="your-library-subtitle">{{ books.length }} book{{ books.length !== 1 ? 's' : '' }} in your collection</span>
+      <span class="your-library-subtitle">
+        {{ books.length }} book{{ books.length !== 1 ? 's' : '' }} in your collection
+      </span>
     </div>
 
-    <!-- Filter tabs -->
     <div class="filter-tabs">
       @for (tab of tabs; track tab.value) {
         <button
           class="filter-tab"
           [class.filter-tab--active]="activeTab === tab.value"
-          (click)="activeTab = tab.value"
-        >{{ tab.label }}</button>
+          (click)="setTab(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
       }
     </div>
   </header>
 
-  <!-- Book list -->
   @if (filteredBooks.length > 0) {
     <div class="book-list">
-      @for (book of filteredBooks; track book.id) {
+      @for (book of paginatedBooks; track book.id) {
         <div class="book-row">
 
           <div class="book-row__cover">
@@ -50,6 +52,36 @@
 
         </div>
       }
+    </div>
+
+    <div class="pagination">
+      <button
+        class="pagination__btn"
+        [disabled]="currentPage === 1"
+        (click)="previousPage()"
+      >
+        Previous
+      </button>
+
+      <div class="pagination__pages">
+        @for (page of pageNumbers; track page) {
+          <button
+            class="pagination__page"
+            [class.pagination__page--active]="currentPage === page"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+      </div>
+
+      <button
+        class="pagination__btn"
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
     </div>
   }
 

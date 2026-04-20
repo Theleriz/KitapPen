@@ -217,3 +217,49 @@
     width: 100%;
   }
 }
+
+.pagination {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pagination__btn,
+.pagination__page {
+  min-width: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.pagination__btn:hover:not(:disabled),
+.pagination__page:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.pagination__page--active {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

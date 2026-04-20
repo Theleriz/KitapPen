@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Напоминание о чтении — BookTracker</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif; color: #333; }
+    .wrapper { max-width: 560px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .header { background-color: #4a90e2; padding: 32px 40px; text-align: center; }
+    .header h1 { margin: 0; color: #fff; font-size: 24px; letter-spacing: 0.5px; }
+    .body { padding: 32px 40px; }
+    .body p { line-height: 1.6; margin: 0 0 16px; }
+    .book-block { background: #f0f6ff; border-left: 4px solid #4a90e2; padding: 12px 16px; border-radius: 4px; margin: 20px 0; }
+    .book-block p { margin: 0; font-weight: bold; }
+    .streak { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 6px 14px; border-radius: 20px; font-size: 14px; margin-bottom: 20px; }
+    .cta { text-align: center; margin: 28px 0 8px; }
+    .cta a { background-color: #4a90e2; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block; }
+    .footer { background: #f5f5f5; padding: 16px 40px; text-align: center; font-size: 12px; color: #999; }
+    .footer a { color: #999; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>📚 BookTracker</h1>
+    </div>
+    <div class="body">
+      <p>Привет, <strong>{{ username }}</strong>!</p>
+      <p>Сегодня ты ещё не читал. Небольшая сессия чтения — это уже отличный результат.</p>
+
+      {% if streak_days > 0 %}
+      <span class="streak">🔥 Стрик: {{ streak_days }} {{ streak_days|pluralize:"день,дня,дней" }} подряд</span>
+      {% endif %}
+
+      {% if last_book %}
+      <div class="book-block">
+        <p>Продолжи читать:</p>
+        <p>{{ last_book.title }}{% if last_book.author %} — {{ last_book.author }}{% endif %}</p>
+      </div>
+      {% else %}
+      <p>Открой любую книгу из своей библиотеки и начни читать прямо сейчас.</p>
+      {% endif %}
+
+      <div class="cta">
+        <a href="http://localhost:4200/library">Открыть библиотеку</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>Ты получаешь это письмо, потому что включил напоминания в <a href="http://localhost:4200">BookTracker</a>.<br>
+      Чтобы отключить уведомления, измени настройки в профиле.</p>
+    </div>
+  </div>
+</body>
+</html>

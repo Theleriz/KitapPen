@@ -51,3 +51,13 @@ class ReadingSession(models.Model):
 
     def __str__(self):
         return f"Session {self.id} for {self.user.username}"
+
+
+class UserNotificationSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_settings')
+    email_notifications_enabled = models.BooleanField(default=True)
+    reminder_hour = models.IntegerField(default=20)  # UTC hour (0-23) to send daily reminder
+    last_sent_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Notifications for {self.user.username}"

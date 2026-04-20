@@ -20,4 +20,8 @@ urlpatterns = [
     path('reading/ping/', views.ReadingPingView.as_view(), name='reading-ping'),
     path('reading/stop/', views.ReadingStopView.as_view(), name='reading-stop'),
     path('reading/stats/', views.ReadingStatsView.as_view(), name='reading-stats'),
+
+    # Notifications
+    path('notifications/settings/', views.NotificationSettingsView.as_view(), name='notification-settings'),
+    path('notifications/send/', views.NotificationSendView.as_view(), name='notification-send'),
 ]

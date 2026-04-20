@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models import Sum, Count, Avg
 from django.contrib.auth.models import User
 from django.http import StreamingHttpResponse
+from django.conf import settings
 from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,13 +13,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .models import Book, Note, ReadingSession
+from .models import Book, Note, ReadingSession, UserNotificationSettings
 from .serializers import (
     RegisterSerializer, UserSerializer,
     BookSerializer, BookDetailSerializer,
     NoteSerializer, ReadingPingRequestSerializer,
     ReadingPingResponseSerializer, ReadingStopSerializer,
-    ReadingStatsSerializer
+    ReadingStatsSerializer, NotificationSettingsSerializer
 )
 
 # MinIO imports (optional - install minio package)
@@ -39,6 +40,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            UserNotificationSettings.objects.create(user=user)
             refresh = RefreshToken.for_user(user)
             return Response({
                 'access': str(refresh.access_token),
@@ -314,3 +316,73 @@ class ReadingStatsView(APIView):
             'avg_per_day': round(avg_per_day, 2),
             'sessions_count': sessions_count
         })
+
+
+# ==================== NOTIFICATIONS ====================
+
+class NotificationSettingsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        settings_obj, _ = UserNotificationSettings.objects.get_or_create(user=request.user)
+        serializer = NotificationSettingsSerializer(settings_obj)
+        return Response(serializer.data)
+
+    def put(self, request):
+        settings_obj, _ = UserNotificationSettings.objects.get_or_create(user=request.user)
+        serializer = NotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationSendView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        from django.core.mail import send_mail
+        from django.contrib.auth.models import User as AuthUser
+
+        subject = request.data.get('subject', '').strip()
+        message = request.data.get('message', '').strip()
+        user_ids = request.data.get('user_ids', [])
+
+        if not subject or not message:
+            return Response(
+                {'error': 'subject and message are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if user_ids:
+            users = AuthUser.objects.filter(id__in=user_ids, email__gt='')
+        else:
+            users = AuthUser.objects.filter(
+                notification_settings__email_notifications_enabled=True
+            ).exclude(email='')
+
+        sent = []
+        failed = []
+        for user in users:
+            html = f"""<!DOCTYPE html>
+<html><body style="font-family:Arial,sans-serif;max-width:560px;margin:40px auto;color:#333">
+  <h2 style="color:#4a90e2">📚 KitapPen</h2>
+  <p>Привет, <strong>{user.username}</strong>!</p>
+  <p style="line-height:1.6">{message}</p>
+  <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+  <p style="font-size:12px;color:#999">BookTracker — твой любимый трекер для чтения</p>
+</body></html>"""
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html,
+                    fail_silently=False,
+                )
+                sent.append(user.username)
+            except Exception as e:
+                failed.append({'user': user.username, 'error': str(e)})
+
+        return Response({'sent': sent, 'failed': failed})

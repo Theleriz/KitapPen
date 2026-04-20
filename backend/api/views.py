@@ -1,5 +1,7 @@
 import base64
 import io
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Sum, Count, Avg
@@ -153,26 +155,68 @@ class NoteDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 # ==================== READING ====================
 
-# Simple "reading detection" - checks if frame contains any content
-# In real implementation, this would use ML/CV to detect if user is reading
+try:
+    import cv2
+    import mediapipe as mp
+    CV_AVAILABLE = True
+except ImportError:
+    CV_AVAILABLE = False
+
+_face_mesh = None
+_cv_executor = ThreadPoolExecutor(max_workers=2)
+
+
+def _get_face_mesh():
+    global _face_mesh
+    if _face_mesh is None:
+        _face_mesh = mp.solutions.face_mesh.FaceMesh(
+            static_image_mode=True,
+            max_num_faces=1,
+            refine_landmarks=True,
+            min_detection_confidence=0.5,
+        )
+    return _face_mesh
+
+
 def detect_reading_from_frame(frame_base64):
-    """
-    Mock implementation of reading detection.
-    In production, this would use computer vision to detect:
-    - If book is open in front of camera
-    - If user is looking at the book
-    - If lighting conditions are good
-    """
+    if not CV_AVAILABLE:
+        import random
+        confidence = random.uniform(0.6, 0.95)
+        return confidence > 0.7, confidence
+
     try:
-        # Decode base64 and check if frame is valid
-        frame_data = base64.b64decode(frame_base64)
-        if len(frame_data) > 1000:  # Simple check for valid image data
-            # Mock: 80% chance user is reading
-            import random
-            confidence = random.uniform(0.6, 0.95)
-            is_reading = confidence > 0.7
-            return is_reading, confidence
-        return False, 0.0
+        img_bytes = base64.b64decode(frame_base64)
+        arr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img is None:
+            return False, 0.0
+
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        results = _get_face_mesh().process(rgb)
+
+        if not results.multi_face_landmarks:
+            return False, 0.0
+
+        lm = results.multi_face_landmarks[0].landmark
+
+        # Head tilt: nose tip vs eye center vs chin
+        nose_tip_y = lm[1].y
+        eye_center_y = (lm[159].y + lm[386].y) / 2
+        chin_y = lm[152].y
+        nose_ratio = (nose_tip_y - eye_center_y) / max(chin_y - eye_center_y, 0.001)
+        head_down = nose_ratio > 0.55
+
+        # Gaze: left iris position relative to eyelids (landmark 468 = left iris)
+        left_iris_y = lm[468].y
+        left_top_lid = lm[159].y
+        left_bot_lid = lm[145].y
+        iris_ratio = (left_iris_y - left_top_lid) / max(left_bot_lid - left_top_lid, 0.001)
+        eyes_down = iris_ratio > 0.6
+
+        reading = head_down or eyes_down
+        confidence = round(min(nose_ratio + (0.2 if eyes_down else 0.0), 1.0), 2)
+        return reading, confidence
+
     except Exception:
         return False, 0.0
 
@@ -188,8 +232,9 @@ class ReadingPingView(APIView):
         frame = serializer.validated_data['frame']
         session_id = serializer.validated_data.get('session_id')
 
-        # Detect reading from frame
-        is_reading, confidence = detect_reading_from_frame(frame)
+        # Detect reading from frame (non-blocking via thread pool)
+        future = _cv_executor.submit(detect_reading_from_frame, frame)
+        is_reading, confidence = future.result(timeout=5)
 
         session = None
         total_seconds = 0

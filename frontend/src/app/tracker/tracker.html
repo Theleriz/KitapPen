@@ -14,6 +14,7 @@
         <!-- Live video feed -->
         <video #videoEl class="camera-feed" autoplay muted playsinline
                [class.camera-feed--hidden]="!isTracking"></video>
+        <canvas #canvasEl width="320" height="240" style="display:none"></canvas>
 
         <!-- Idle placeholder -->
         @if (!isTracking) {

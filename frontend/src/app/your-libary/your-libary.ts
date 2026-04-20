@@ -23,18 +23,20 @@ interface Tab {
 })
 export class YourLibary {
   activeTab: 'all' | ReadingStatus = 'all';
+  currentPage = 1;
+  readonly pageSize = 3;
 
   tabs: Tab[] = [
-    { label: 'All',         value: 'all' },
-    { label: 'Reading',     value: 'reading' },
-    { label: 'Completed',   value: 'completed' },
+    { label: 'All', value: 'all' },
+    { label: 'Reading', value: 'reading' },
+    { label: 'Completed', value: 'completed' },
     { label: 'Not started', value: 'not_started' },
   ];
 
   books: UserBook[] = [
-    { id: 1, title: '1984',                   author: 'George Orwell',       progressPct: 68, status: 'reading' },
-    { id: 2, title: 'Brave New World',         author: 'Aldous Huxley',       progressPct: 100, status: 'completed' },
-    { id: 3, title: 'The Great Gatsby',        author: 'F. Scott Fitzgerald', progressPct: 0,  status: 'not_started' },
+    { id: 1, title: '1984', author: 'George Orwell', progressPct: 68, status: 'reading' },
+    { id: 2, title: 'Brave New World', author: 'Aldous Huxley', progressPct: 100, status: 'completed' },
+    { id: 3, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', progressPct: 0, status: 'not_started' },
   ];
 
   get filteredBooks(): UserBook[] {
@@ -42,10 +44,41 @@ export class YourLibary {
     return this.books.filter(b => b.status === this.activeTab);
   }
 
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredBooks.length / this.pageSize));
+  }
+
+  get paginatedBooks(): UserBook[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredBooks.slice(start, start + this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  setTab(tab: 'all' | ReadingStatus): void {
+    this.activeTab = tab;
+    this.currentPage = 1;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+  }
+
+  previousPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
   statusLabel(status: ReadingStatus): string {
     const labels: Record<ReadingStatus, string> = {
-      reading:     'Reading',
-      completed:   'Completed',
+      reading: 'Reading',
+      completed: 'Completed',
       not_started: 'Not started',
     };
     return labels[status];

@@ -4,3 +4,4 @@ front-context.md
 .env
 .claude
 backend\.env
+backend/face_landmarker.task

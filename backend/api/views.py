@@ -22,6 +22,7 @@ from .serializers import (
     ReadingPingResponseSerializer, ReadingStopSerializer,
     ReadingStatsSerializer, NotificationSettingsSerializer
 )
+from .detector import analyze_frame
 
 # MinIO imports (optional - install minio package)
 try:
@@ -169,30 +170,6 @@ class NoteDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 # ==================== READING ====================
 
-# Simple "reading detection" - checks if frame contains any content
-# In real implementation, this would use ML/CV to detect if user is reading
-def detect_reading_from_frame(frame_base64):
-    """
-    Mock implementation of reading detection.
-    In production, this would use computer vision to detect:
-    - If book is open in front of camera
-    - If user is looking at the book
-    - If lighting conditions are good
-    """
-    try:
-        # Decode base64 and check if frame is valid
-        frame_data = base64.b64decode(frame_base64)
-        if len(frame_data) > 1000:  # Simple check for valid image data
-            # Mock: 80% chance user is reading
-            import random
-            confidence = random.uniform(0.6, 0.95)
-            is_reading = confidence > 0.7
-            return is_reading, confidence
-        return False, 0.0
-    except Exception:
-        return False, 0.0
-
-
 class ReadingPingView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -205,7 +182,7 @@ class ReadingPingView(APIView):
         session_id = serializer.validated_data.get('session_id')
 
         # Detect reading from frame
-        is_reading, confidence = detect_reading_from_frame(frame)
+        is_reading, confidence = analyze_frame(frame)
 
         session = None
         total_seconds = 0

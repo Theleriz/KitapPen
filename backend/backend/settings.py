@@ -172,3 +172,9 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'BookTracker <noreply@
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
 ]
+
+# MediaPipe model path — face_landmarker.task must be placed in backend/
+MEDIAPIPE_MODEL_PATH = BASE_DIR / "face_landmarker.task"
+
+# Limit uploaded frame size to 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

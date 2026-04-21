@@ -1,62 +1,49 @@
-import { Injectable, signal } from '@angular/core';
-
-export interface AuthUser {
-  name: string;
-  email: string;
-}
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly storageKey = 'booktracker_user';
+  private apiUrl = 'http://127.0.0.1:8000/api';
 
-  currentUser = signal<AuthUser | null>(this.getUserFromStorage());
+  constructor(private http: HttpClient) {}
 
-  private getUserFromStorage(): AuthUser | null {
-    const raw = localStorage.getItem(this.storageKey);
-    if (!raw) return null;
+  // LOGIN
+  signIn(username: string, password: string) {
+    return this.http.post<any>(`${this.apiUrl}/auth/login/`, {
+      username,
+      password,
+    });
+  }
 
-    try {
-      return JSON.parse(raw) as AuthUser;
-    } catch {
-      localStorage.removeItem(this.storageKey);
-      return null;
+  // REGISTER
+  signUp(username: string, email: string, password: string) {
+    return this.http.post<any>(`${this.apiUrl}/auth/register/`, {
+      username,
+      email,
+      password,
+    });
+  }
+
+  // SAVE TOKENS
+  saveTokens(tokens: any) {
+    localStorage.setItem('access', tokens.access);
+    if (tokens.refresh) {
+      localStorage.setItem('refresh', tokens.refresh);
     }
   }
 
-  isAuthenticated(): boolean {
-    return this.currentUser() !== null;
-  }
-
-  signIn(email: string, password: string): boolean {
-    if (!email.trim() || !password.trim()) return false;
-
-    const user: AuthUser = {
-      name: email.split('@')[0] || 'Reader',
-      email: email.trim(),
-    };
-
-    localStorage.setItem(this.storageKey, JSON.stringify(user));
-    this.currentUser.set(user);
-    return true;
-  }
-
-  signUp(name: string, email: string, password: string): boolean {
-    if (!name.trim() || !email.trim() || !password.trim()) return false;
-
-    const user: AuthUser = {
-      name: name.trim(),
-      email: email.trim(),
-    };
-
-    localStorage.setItem(this.storageKey, JSON.stringify(user));
-    this.currentUser.set(user);
-    return true;
+  getAccessToken(): string | null {
+    return localStorage.getItem('access');
   }
 
   logout(): void {
-    localStorage.removeItem(this.storageKey);
-    this.currentUser.set(null);
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
   }
 }

@@ -1,0 +1,454 @@
+{
+  "info": {
+    "name": "KitapPen API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "kitappen-api-collection"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"securepass123\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"securepass123\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/refresh/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/auth/logout/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout", ""] },
+            "body": { "mode": "raw", "raw": "{}" }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Successfully logged out.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "List Books",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/", "host": ["{{baseUrl}}"], "path": ["api", "books", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Clean Code\",\n    \"author\": \"Robert C. Martin\",\n    \"pdf_file\": null,\n    \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n    \"total_pages\": 431\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Upload Book",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/", "host": ["{{baseUrl}}"], "path": ["api", "books", ""] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Clean Code", "type": "text" },
+                { "key": "author", "value": "Robert C. Martin", "type": "text" },
+                { "key": "total_pages", "value": "431", "type": "text" },
+                { "key": "pdf_file", "type": "file", "src": "" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"pdf_file\": \"/media/books/clean_code.pdf\",\n  \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n  \"total_pages\": 431\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Book Detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/1/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"user\": 1,\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"pdf_file\": \"/media/books/clean_code.pdf\",\n  \"minio_path\": \"\",\n  \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n  \"total_pages\": 431\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Book",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/1/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", ""] }
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Stream Book PDF",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/1/stream/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", "stream", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK — PDF binary stream",
+              "status": "OK",
+              "code": 200,
+              "body": "<binary PDF content>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "List Notes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/?book=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", ""],
+              "query": [{ "key": "book", "value": "1", "description": "Optional: filter by book ID" }]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": 1,\n    \"book\": 1,\n    \"book_title\": \"Clean Code\",\n    \"content\": \"Great chapter on functions\",\n    \"page_number\": 42,\n    \"created_at\": \"2026-04-20T12:00:00Z\",\n    \"updated_at\": \"2026-04-20T12:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/notes/", "host": ["{{baseUrl}}"], "path": ["api", "notes", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"book\": 1,\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-20T12:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Note Detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-20T12:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Note",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"book\": 1,\n  \"content\": \"Updated note content\",\n  \"page_number\": 45\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Updated note content\",\n  \"page_number\": 45,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-21T09:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Note",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] }
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reading",
+      "item": [
+        {
+          "name": "Reading Ping",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/reading/ping/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "ping", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"frame\": \"<base64-encoded-image-data>\",\n  \"session_id\": null\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"reading\": true,\n  \"confidence\": 0.87,\n  \"session_id\": 5,\n  \"total_seconds\": 15\n}"
+            }
+          ]
+        },
+        {
+          "name": "Stop Reading Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/reading/stop/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "stop", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": 5\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"total_seconds\": 180\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reading Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/reading/stats/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "stats", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"total_seconds\": 7200,\n  \"streak_days\": 3,\n  \"avg_per_day\": 2400.0,\n  \"sessions_count\": 9\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notification Settings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications/settings/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "settings", ""] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 9,\n  \"last_sent_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Notification Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/notifications/settings/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "settings", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 20\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 20,\n  \"last_sent_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Send Notification (Admin only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/notifications/send/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "send", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Reading reminder\",\n  \"message\": \"Don't forget to read today!\",\n  \"user_ids\": [1, 2]\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"sent\": [\"testuser\"],\n  \"failed\": []\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Book, Note, ReadingSession
+from .models import Book, Note, ReadingSession, UserNotificationSettings
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -97,3 +97,10 @@ class ReadingPingResponseSerializer(serializers.Serializer):
 
 class ReadingStopSerializer(serializers.Serializer):
     session_id = serializers.IntegerField(required=True)
+
+
+class NotificationSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserNotificationSettings
+        fields = ('email_notifications_enabled', 'reminder_hour', 'last_sent_at')
+        read_only_fields = ('last_sent_at',)

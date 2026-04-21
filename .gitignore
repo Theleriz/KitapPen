@@ -2,3 +2,6 @@ project-context.md
 front-context.md
 .venv
 .env
+.claude
+backend\.env
+backend/face_landmarker.task

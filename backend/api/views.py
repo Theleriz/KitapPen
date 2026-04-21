@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import StreamingHttpResponse
 from django.conf import settings
 from rest_framework import status, generics, permissions
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -55,6 +56,19 @@ class LoginView(TokenObtainPairView):
 
 class RefreshTokenView(TokenRefreshView):
     pass
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def me_view(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def logout_view(request):
+    return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
 
 
 # ==================== BOOKS ====================

@@ -3,3 +3,4 @@ front-context.md
 .venv
 .env
 .claude
+backend\.env

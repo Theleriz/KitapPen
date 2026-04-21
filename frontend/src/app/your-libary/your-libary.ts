@@ -118,9 +118,7 @@ export class YourLibary implements OnInit, OnDestroy {
           return { id: b.id, title: b.title, author: b.author || 'Unknown Author', progressPct, status, pages: totalPages };
         });
         this.isLoading = false;
-        // Reset to first page and 'all' tab after loading
         this.currentPage = 1;
-        this.activeTab = 'all';
         // Force UI update
         this.cdr.detectChanges();
         console.log('UI updated with new books');
@@ -249,13 +247,8 @@ export class YourLibary implements OnInit, OnDestroy {
   }
 
   setTab(tab: 'all' | ReadingStatus): void {
-    console.log('Setting tab to:', tab);
     this.activeTab = tab;
     this.currentPage = 1;
-    // Ensure we're not in loading state when switching tabs
-    this.isLoading = false;
-    // Reload books when switching tabs to ensure fresh data
-    this.loadBooks();
   }
 
   goToPage(page: number): void {

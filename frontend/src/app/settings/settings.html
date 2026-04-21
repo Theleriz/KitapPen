@@ -59,18 +59,6 @@
         <h3 class="card-title">General</h3>
   
         <div class="form-grid">
-          <div class="form-block">
-            <label class="form-label" for="language">Language</label>
-            <select
-              id="language"
-              class="form-select"
-              [(ngModel)]="settings.language"
-            >
-              <option>English</option>
-              <option>Russian</option>
-              <option>Kazakh</option>
-            </select>
-          </div>
   
           <div class="form-block">
             <label class="form-label" for="goal">Daily reading goal (minutes)</label>
@@ -84,8 +72,10 @@
         </div>
   
         <div class="card-actions">
+          <button class="btn-reset" (click)="resetSettings()">Reset to defaults</button>
           <button class="btn-save" (click)="saveSettings()">Save settings</button>
         </div>
+        <div class="save-toast" [class.save-toast--visible]="saved">Settings saved</div>
       </div>
   
     </div>

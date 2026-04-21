@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 })
 
             if dry_run:
-                self.stdout.write(f'[DRY RUN] → {user.username} <{user.email}> | {subject}')
+                self.stdout.write(f'[DRY RUN] {user.username} <{user.email}> | {subject}')
                 sent += 1
                 continue
 
@@ -115,7 +115,7 @@ class Command(BaseCommand):
             ns.last_sent_at = timezone.now()
             ns.save(update_fields=['last_sent_at'])
             sent += 1
-            self.stdout.write(f'Sent → {user.username} <{user.email}>')
+            self.stdout.write(f'Sent: {user.username} <{user.email}>')
 
         self.stdout.write(self.style.SUCCESS(f'Done. Sent: {sent}, skipped: {skipped}.'))
 

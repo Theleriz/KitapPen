@@ -12,6 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'date_joined', 'role')
 
     def get_role(self, obj):
+        if obj.is_staff or obj.is_superuser:
+            return 'moderator'
         try:
             return obj.profile.role
         except UserProfile.DoesNotExist:

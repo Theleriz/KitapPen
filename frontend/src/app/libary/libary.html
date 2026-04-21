@@ -20,6 +20,37 @@
     </div>
   </header>
 
+  @if (isModerator) {
+    <section class="upload-section">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <h2 class="upload-title" style="margin:0;">Add book to public library</h2>
+        <button class="upload-btn" type="button" (click)="toggleUpload()">
+          {{ showUpload ? 'Close' : '+ Add book' }}
+        </button>
+      </div>
+
+      @if (showUpload) {
+        <div class="upload-form" style="margin-top:12px;">
+          <input type="file" id="libFileInput" (change)="onFileSelected($event)" class="file-input" accept=".pdf" />
+
+          @if (selectedFile) {
+            <div class="upload-fields">
+              <input type="text" [(ngModel)]="uploadTitle" placeholder="Book title" class="upload-input" />
+              <input type="text" [(ngModel)]="uploadAuthor" placeholder="Author name (optional)" class="upload-input" />
+            </div>
+          }
+
+          <button class="upload-btn" type="button" (click)="upload()" [disabled]="!selectedFile || isUploading">
+            @if (isUploading) { Uploading... } @else { Upload }
+          </button>
+
+          @if (uploadError) { <div class="upload-message upload-error">{{ uploadError }}</div> }
+          @if (uploadSuccess) { <div class="upload-message upload-success">{{ uploadSuccess }}</div> }
+        </div>
+      }
+    </section>
+  }
+
   @if (loading) {
     <div class="empty-state">
       <p>Loading books…</p>
@@ -50,7 +81,6 @@
           </div>
 
           <div class="book-card__actions">
-            <button class="btn-read">Read</button>
             <button
               class="btn-add"
               type="button"
@@ -61,6 +91,11 @@
               @else if (addedBookIds.has(book.id)) { ✓ Added }
               @else { + Add to my library }
             </button>
+            @if (isModerator) {
+              <button class="btn-remove" type="button" (click)="deleteFromLibrary(book.id, book.title)">
+                Remove
+              </button>
+            }
           </div>
         </div>
       }

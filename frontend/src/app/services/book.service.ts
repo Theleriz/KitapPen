@@ -55,4 +55,16 @@ export class BookService {
     if (totalPages !== undefined) body['total_pages'] = totalPages;
     return this.http.patch<{ last_page: number; total_pages: number }>(`${this.apiUrl}/books/${bookId}/progress/`, body);
   }
+
+  getModeratorBooks(): Observable<Book[]> {
+    return this.http.get<Book[]>(`${this.apiUrl}/moderator/books/`);
+  }
+
+  uploadPublicBook(formData: FormData): Observable<Book> {
+    return this.http.post<Book>(`${this.apiUrl}/moderator/books/`, formData);
+  }
+
+  deletePublicBook(bookId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/moderator/books/${bookId}/`);
+  }
 }

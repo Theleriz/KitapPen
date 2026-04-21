@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
 
-from .models import Book, Note, ReadingSession, UserNotificationSettings
+from .models import Book, Note, ReadingSession, UserNotificationSettings, UserProfile
 from .serializers import (
     RegisterSerializer, UserSerializer, UserProfileUpdateSerializer,
     BookSerializer, BookDetailSerializer,
@@ -26,6 +26,18 @@ from .serializers import (
     ReadingSessionListSerializer
 )
 from .detector import analyze_frame
+
+class IsModeratorUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not (request.user and request.user.is_authenticated):
+            return False
+        if request.user.is_staff or request.user.is_superuser:
+            return True
+        try:
+            return request.user.profile.role == 'moderator'
+        except Exception:
+            return False
+
 
 # MinIO imports (optional - install minio package)
 try:
@@ -46,6 +58,7 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             UserNotificationSettings.objects.create(user=user)
+            UserProfile.objects.create(user=user, role='reader')
             refresh = RefreshToken.for_user(user)
             return Response({
                 'access': str(refresh.access_token),
@@ -538,3 +551,104 @@ class NotificationSendView(APIView):
                 failed.append({'user': user.username, 'error': str(e)})
 
         return Response({'sent': sent, 'failed': failed})
+
+
+# ==================== LEADERBOARD ====================
+
+class ReadingLeaderboardView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from django.db.models.functions import TruncDate
+
+        # Top 10 by total read time
+        time_qs = (
+            ReadingSession.objects
+            .filter(is_active=False)
+            .values('user__id', 'user__username')
+            .annotate(total_seconds=Sum('total_seconds'))
+            .order_by('-total_seconds')[:10]
+        )
+        time_leaders = [
+            {
+                'user_id': e['user__id'],
+                'username': e['user__username'],
+                'total_seconds': e['total_seconds'],
+                'is_current_user': e['user__id'] == request.user.id,
+            }
+            for e in time_qs
+        ]
+
+        # Top 10 by day streak — compute per user
+        today = timezone.now().date()
+        user_days_qs = (
+            ReadingSession.objects
+            .filter(is_active=False)
+            .annotate(day=TruncDate('started_at'))
+            .values('user__id', 'user__username', 'day')
+            .distinct()
+        )
+
+        buckets: dict = {}
+        for entry in user_days_qs:
+            uid = entry['user__id']
+            if uid not in buckets:
+                buckets[uid] = {'username': entry['user__username'], 'days': set()}
+            buckets[uid]['days'].add(entry['day'])
+
+        streak_leaders = []
+        for uid, data in buckets.items():
+            sorted_days = sorted(data['days'], reverse=True)
+            streak = 0
+            if sorted_days and (today - sorted_days[0]).days <= 1:
+                streak = 1
+                for i in range(1, len(sorted_days)):
+                    if (sorted_days[i - 1] - sorted_days[i]).days == 1:
+                        streak += 1
+                    else:
+                        break
+            streak_leaders.append({
+                'user_id': uid,
+                'username': data['username'],
+                'streak_days': streak,
+                'is_current_user': uid == request.user.id,
+            })
+
+        streak_leaders.sort(key=lambda x: x['streak_days'], reverse=True)
+        streak_leaders = streak_leaders[:10]
+
+        return Response({
+            'time_leaders': time_leaders,
+            'streak_leaders': streak_leaders,
+        })
+
+
+# ==================== MODERATOR ====================
+
+class ModeratorBookListCreateView(APIView):
+    permission_classes = [IsModeratorUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get(self, request):
+        books = Book.objects.filter(is_public=True)
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BookSerializer(data=request.data)
+        if serializer.is_valid():
+            book = serializer.save(user=request.user, is_public=True, last_page=0)
+            return Response(BookSerializer(book).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ModeratorBookDeleteView(APIView):
+    permission_classes = [IsModeratorUser]
+
+    def delete(self, request, pk):
+        try:
+            book = Book.objects.get(pk=pk, is_public=True)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+        book.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

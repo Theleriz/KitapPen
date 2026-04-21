@@ -1,0 +1,267 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--color-bg-subtle);
+}
+
+.moderator-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.moderator-header {
+  margin-bottom: 32px;
+}
+
+.moderator-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.moderator-subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* Upload section */
+.upload-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.upload-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-input {
+  padding: 10px 0;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.upload-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.upload-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+}
+
+.upload-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.upload-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-message {
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.upload-error {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.upload-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* States */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.retry-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* Book list */
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.book-row {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--color-card-shadow);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.book-row:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.book-row__cover {
+  width: 48px;
+  height: 64px;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.book-row__cover-letter {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4f46e5;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.book-row__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-row__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-row__author {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.book-row__pages {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.book-row__actions {
+  flex-shrink: 0;
+}
+
+.btn-delete {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-delete:hover {
+  background: #b91c1c;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.empty-state__icon {
+  font-size: 40px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  .book-row {
+    flex-wrap: wrap;
+  }
+
+  .book-row__actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

@@ -1,15 +1,19 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { BookService, Book } from '../services/book.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-libary',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './libary.html',
   styleUrl: './libary.css',
 })
 export class Libary implements OnInit {
   private bookService = inject(BookService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   searchQuery = '';
   currentPage = 1;
@@ -21,7 +25,25 @@ export class Libary implements OnInit {
   addedBookIds = new Set<number>();
   addingBookIds = new Set<number>();
 
+  isModerator = false;
+  showUpload = false;
+  selectedFile: File | null = null;
+  uploadTitle = '';
+  uploadAuthor = '';
+  isUploading = false;
+  uploadError: string | null = null;
+  uploadSuccess: string | null = null;
+
   ngOnInit(): void {
+    this.authService.getUserProfile().subscribe({
+      next: profile => { this.isModerator = profile.role === 'moderator'; },
+      error: () => { this.isModerator = false; }
+    });
+
+    this.loadBooks();
+  }
+
+  loadBooks(): void {
     this.loading = true;
     this.bookService.getPublicBooks().subscribe({
       next: (books) => {
@@ -83,6 +105,78 @@ export class Libary implements OnInit {
       },
       error: () => {
         this.addingBookIds.delete(book.id);
+      }
+    });
+  }
+
+  toggleUpload(): void {
+    this.showUpload = !this.showUpload;
+    this.uploadError = null;
+    this.uploadSuccess = null;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target?.files?.[0] as File | undefined;
+    if (!file) return;
+    this.selectedFile = file;
+    this.uploadTitle = file.name.replace(/\.[^/.]+$/, '');
+    this.uploadError = null;
+    this.uploadSuccess = null;
+  }
+
+  upload(): void {
+    if (!this.selectedFile) { this.uploadError = 'Please select a file first'; return; }
+    if (this.selectedFile.size === 0) { this.uploadError = 'File is empty'; return; }
+
+    this.isUploading = true;
+    this.uploadError = null;
+    this.uploadSuccess = null;
+
+    const formData = new FormData();
+    formData.append('pdf_file', this.selectedFile);
+    formData.append('title', this.uploadTitle || this.selectedFile.name);
+    formData.append('author', this.uploadAuthor || '');
+
+    this.bookService.uploadPublicBook(formData).subscribe({
+      next: (book) => {
+        this.uploadSuccess = `"${book.title}" added to the library.`;
+        this.isUploading = false;
+        this.selectedFile = null;
+        this.uploadTitle = '';
+        this.uploadAuthor = '';
+        const fileInput = document.getElementById('libFileInput') as HTMLInputElement | null;
+        if (fileInput) fileInput.value = '';
+        this.books.unshift(book);
+        this.cdr.detectChanges();
+        setTimeout(() => { this.uploadSuccess = null; this.cdr.detectChanges(); }, 3000);
+      },
+      error: (err) => {
+        this.isUploading = false;
+        const data = err?.error;
+        if (data && typeof data === 'object') {
+          const firstKey = Object.keys(data)[0];
+          const msg = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey];
+          this.uploadError = String(msg || 'Upload failed.');
+        } else {
+          this.uploadError = 'Upload failed. Please try again.';
+        }
+        this.cdr.detectChanges();
+        setTimeout(() => { this.uploadError = null; this.cdr.detectChanges(); }, 5000);
+      },
+    });
+  }
+
+  deleteFromLibrary(bookId: number, bookTitle: string): void {
+    if (!confirm(`Remove "${bookTitle}" from the public library?`)) return;
+    this.bookService.deletePublicBook(bookId).subscribe({
+      next: () => {
+        this.books = this.books.filter(b => b.id !== bookId);
+        this.currentPage = Math.min(this.currentPage, this.totalPages);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Failed to delete book.';
+        setTimeout(() => { this.error = ''; this.cdr.detectChanges(); }, 5000);
       }
     });
   }

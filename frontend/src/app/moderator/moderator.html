@@ -1,0 +1,108 @@
+<div class="moderator-page">
+
+  <header class="moderator-header">
+    <div>
+      <h1 class="moderator-title">Moderator Panel</h1>
+      <span class="moderator-subtitle">
+        {{ books.length }} book{{ books.length !== 1 ? 's' : '' }} in the public library
+      </span>
+    </div>
+  </header>
+
+  <section class="upload-section">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <h2 class="upload-title" style="margin:0;">Add book to public library</h2>
+      <button class="upload-btn" type="button" (click)="toggleUpload()">
+        {{ showUpload ? 'Close' : '+ Add book' }}
+      </button>
+    </div>
+
+    @if (showUpload) {
+      <div class="upload-form" style="margin-top:12px;">
+        <input
+          type="file"
+          id="modFileInput"
+          (change)="onFileSelected($event)"
+          class="file-input"
+          accept=".pdf"
+        />
+
+        @if (selectedFile) {
+          <div class="upload-fields">
+            <input
+              type="text"
+              [(ngModel)]="uploadTitle"
+              placeholder="Book title"
+              class="upload-input"
+            />
+            <input
+              type="text"
+              [(ngModel)]="uploadAuthor"
+              placeholder="Author name (optional)"
+              class="upload-input"
+            />
+          </div>
+        }
+
+        <button
+          class="upload-btn"
+          type="button"
+          (click)="upload()"
+          [disabled]="!selectedFile || isUploading"
+        >
+          @if (isUploading) { Uploading... } @else { Upload }
+        </button>
+
+        @if (uploadError) {
+          <div class="upload-message upload-error">{{ uploadError }}</div>
+        }
+        @if (uploadSuccess) {
+          <div class="upload-message upload-success">{{ uploadSuccess }}</div>
+        }
+      </div>
+    }
+  </section>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <span>Loading books...</span>
+    </div>
+  }
+
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <span>{{ error }}</span>
+      <button class="retry-btn" (click)="loadBooks()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading && books.length > 0) {
+    <div class="book-list">
+      @for (book of books; track book.id) {
+        <div class="book-row">
+          <div class="book-row__cover">
+            <span class="book-row__cover-letter">{{ book.title[0] }}</span>
+          </div>
+          <div class="book-row__info">
+            <h3 class="book-row__title">{{ book.title }}</h3>
+            <p class="book-row__author">{{ book.author || 'Unknown author' }}</p>
+            @if (book.total_pages) {
+              <span class="book-row__pages">{{ book.total_pages }} pages</span>
+            }
+          </div>
+          <div class="book-row__actions">
+            <button class="btn-delete" (click)="deleteBook(book.id, book.title)">Remove</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading && !error && books.length === 0) {
+    <div class="empty-state">
+      <span class="empty-state__icon">📚</span>
+      <p>No books in the public library yet.<br>Use "Add book" above to publish one.</p>
+    </div>
+  }
+
+</div>

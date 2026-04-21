@@ -7,7 +7,9 @@ import { Profile } from './profile/profile';
 import { Settings } from './settings/settings';
 import { Login } from './login/login';
 import { Reader } from './reader/reader';
+import { Moderator } from './moderator/moderator';
 import { authGuard } from './auth.guard';
+import { moderatorGuard } from './moderator.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,6 +22,7 @@ export const routes: Routes = [
   { path: 'statistics', component: Statistics, canActivate: [authGuard] },
   { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'settings', component: Settings, canActivate: [authGuard] },
+  { path: 'moderator', component: Moderator, canActivate: [moderatorGuard] },
 
   { path: '**', redirectTo: 'login' },
 ];

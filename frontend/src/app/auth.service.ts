@@ -7,6 +7,7 @@ export interface UserProfile {
   username: string;
   email: string;
   date_joined: string;
+  role: 'reader' | 'moderator';
 }
 
 interface User {

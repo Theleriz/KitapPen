@@ -18,7 +18,7 @@ interface User {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:8000/';
+  private apiUrl = 'http://127.0.0.1:8000/api/';
 
 
   constructor(private http: HttpClient) {}
@@ -38,6 +38,11 @@ export class AuthService {
       email,
       password,
     });
+  }
+
+  refreshToken() {
+    const refresh = localStorage.getItem('refresh');
+    return this.http.post<any>(`${this.apiUrl}auth/refresh/`, { refresh });
   }
 
   logoutFromServer() {

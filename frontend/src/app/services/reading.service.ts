@@ -11,7 +11,7 @@ export interface ReadingStats {
 
 @Injectable({ providedIn: 'root' })
 export class ReadingService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'http://127.0.0.1:8000/api';
 
   constructor(private http: HttpClient) {}
 

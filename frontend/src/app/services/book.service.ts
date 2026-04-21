@@ -50,7 +50,9 @@ export class BookService {
     return this.http.get(`${this.apiUrl}/books/${bookId}/stream/`, { responseType: 'blob' });
   }
 
-  updateLastPage(bookId: number, page: number): Observable<{ last_page: number }> {
-    return this.http.patch<{ last_page: number }>(`${this.apiUrl}/books/${bookId}/progress/`, { last_page: page });
+  updateLastPage(bookId: number, page: number, totalPages?: number): Observable<{ last_page: number; total_pages: number }> {
+    const body: Record<string, number> = { last_page: page };
+    if (totalPages !== undefined) body['total_pages'] = totalPages;
+    return this.http.patch<{ last_page: number; total_pages: number }>(`${this.apiUrl}/books/${bookId}/progress/`, body);
   }
 }

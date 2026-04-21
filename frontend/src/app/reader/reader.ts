@@ -16,6 +16,7 @@ export class Reader implements OnInit, OnDestroy {
   private router = inject(Router);
   private bookService = inject(BookService);
 
+  bookId = 0;
   book: Book | null = null;
   pdfSrc: Uint8Array | null = null;
   currentPage = 1;
@@ -27,15 +28,22 @@ export class Reader implements OnInit, OnDestroy {
   private pageChange$ = new Subject<number>();
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.bookId = Number(this.route.snapshot.paramMap.get('id'));
 
     forkJoin({
-      book: this.bookService.getBook(id),
-      blob: this.bookService.getBookStream(id),
+      book: this.bookService.getBook(this.bookId),
+      blob: this.bookService.getBookStream(this.bookId),
     }).subscribe({
       next: ({ book, blob }) => {
         this.book = book;
-        this.currentPage = book.last_page || 1;
+        const lastPage = book.last_page ?? 0;
+        this.currentPage = lastPage > 0 ? lastPage : 1;
+
+        // Immediately mark as started if this is the first open
+        if (lastPage === 0) {
+          this.bookService.updateLastPage(this.bookId, 1).subscribe();
+        }
+
         blob.arrayBuffer().then(buf => {
           this.pdfSrc = new Uint8Array(buf);
           this.loading = false;
@@ -47,11 +55,10 @@ export class Reader implements OnInit, OnDestroy {
       },
     });
 
-    // Debounce page saves — send to server 1s after user stops turning pages
     this.pageChange$
       .pipe(
-        debounceTime(1000),
-        switchMap(page => this.bookService.updateLastPage(id, page)),
+        debounceTime(800),
+        switchMap(page => this.bookService.updateLastPage(this.bookId, page)),
         takeUntil(this.destroy$),
       )
       .subscribe();
@@ -59,6 +66,8 @@ export class Reader implements OnInit, OnDestroy {
 
   onLoaded(pdf: { numPages: number }): void {
     this.totalPages = pdf.numPages;
+    // Save total_pages to DB so progress bar works in My Library
+    this.bookService.updateLastPage(this.bookId, this.currentPage, pdf.numPages).subscribe();
   }
 
   onPageChange(page: number): void {
@@ -67,14 +76,22 @@ export class Reader implements OnInit, OnDestroy {
   }
 
   prevPage(): void {
-    if (this.currentPage > 1) this.currentPage--;
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.pageChange$.next(this.currentPage);
+    }
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages) this.currentPage++;
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.pageChange$.next(this.currentPage);
+    }
   }
 
   goBack(): void {
+    // Save immediately before navigating away (don't wait for debounce)
+    this.bookService.updateLastPage(this.bookId, this.currentPage).subscribe();
     this.router.navigate(['/my-library']);
   }
 

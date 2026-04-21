@@ -35,7 +35,7 @@ export class YourLibary implements OnInit, OnDestroy {
 
   tabs: Tab[] = [
     { label: 'All', value: 'all' },
-    { label: 'Reading', value: 'reading' },
+    { label: 'Started', value: 'reading' },
     { label: 'Completed', value: 'completed' },
     { label: 'Not started', value: 'not_started' },
   ];
@@ -103,13 +103,17 @@ export class YourLibary implements OnInit, OnDestroy {
       next: (books: Book[]) => {
         console.log('Books loaded successfully:', books.length);
         this.books = books.map(b => {
-          const lastPage = b.last_page ?? 1;
+          const lastPage = b.last_page ?? 0;
           const totalPages = b.total_pages ?? 0;
           let progressPct = 0;
           let status: ReadingStatus = 'not_started';
-          if (totalPages > 0 && lastPage > 1) {
-            progressPct = Math.min(100, Math.round((lastPage / totalPages) * 100));
-            status = progressPct >= 100 ? 'completed' : 'reading';
+          if (lastPage > 0) {
+            if (totalPages > 0) {
+              progressPct = Math.min(100, Math.round((lastPage / totalPages) * 100));
+              status = progressPct >= 100 ? 'completed' : 'reading';
+            } else {
+              status = 'reading'; // opened but total_pages not yet known
+            }
           }
           return { id: b.id, title: b.title, author: b.author || 'Unknown Author', progressPct, status, pages: totalPages };
         });
@@ -269,7 +273,7 @@ export class YourLibary implements OnInit, OnDestroy {
 
   statusLabel(status: ReadingStatus): string {
     const labels: Record<ReadingStatus, string> = {
-      reading: 'Reading',
+      reading: 'Started',
       completed: 'Completed',
       not_started: 'Not started',
     };

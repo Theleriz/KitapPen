@@ -100,7 +100,7 @@ class BookListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         # Upload into My Library
-        book = serializer.save(user=self.request.user, is_public=False, last_page=1)
+        book = serializer.save(user=self.request.user, is_public=False, last_page=0)
         # TODO: Upload to MinIO here if configured
         return book
 
@@ -149,7 +149,7 @@ class AddPublicBookToMyLibraryView(APIView):
             pdf_file=public_book.pdf_file,
             minio_path=public_book.minio_path,
             total_pages=public_book.total_pages,
-            last_page=1,
+            last_page=0,
             is_public=False,
         )
         return Response(BookSerializer(user_book).data, status=status.HTTP_201_CREATED)
@@ -221,11 +221,18 @@ class UpdateLastPageView(APIView):
             book = Book.objects.get(pk=pk, user=request.user)
         except Book.DoesNotExist:
             return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+        fields = []
         page = request.data.get('last_page')
-        if page is not None:
+        if page is not None and int(page) > book.last_page:
             book.last_page = int(page)
-            book.save(update_fields=['last_page'])
-        return Response({'last_page': book.last_page})
+            fields.append('last_page')
+        total_pages = request.data.get('total_pages')
+        if total_pages is not None and book.total_pages == 0:
+            book.total_pages = int(total_pages)
+            fields.append('total_pages')
+        if fields:
+            book.save(update_fields=fields)
+        return Response({'last_page': book.last_page, 'total_pages': book.total_pages})
 
 
 # ==================== NOTES ====================

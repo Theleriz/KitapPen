@@ -36,7 +36,7 @@ class Book(models.Model):
 
     total_pages = models.IntegerField(default=0)
 
-    last_page = models.PositiveIntegerField(default=1)
+    last_page = models.PositiveIntegerField(default=0)
 
     is_public = models.BooleanField(default=False)
 

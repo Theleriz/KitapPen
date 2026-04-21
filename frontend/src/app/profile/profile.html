@@ -4,6 +4,14 @@
       <h1 class="profile-title">Profile</h1>
       <span class="profile-subtitle">Manage your personal information</span>
     </header>
+
+    @if (loading) {
+      <p style="padding: 24px;">Loading profile…</p>
+    }
+
+    @if (error) {
+      <p style="padding: 24px; color: #e53e3e;">{{ error }}</p>
+    }
   
     <div class="profile-layout">
   
@@ -83,7 +91,15 @@
           </div>
   
           <div class="card-actions">
-            <button class="btn-save" (click)="saveProfile()">Save changes</button>
+            <button class="btn-save" (click)="saveProfile()" [disabled]="saveLoading">
+              {{ saveLoading ? 'Saving…' : 'Save changes' }}
+            </button>
+            @if (saveSuccess) {
+              <span style="color: #38a169; font-size: 14px;">Changes saved!</span>
+            }
+            @if (saveError) {
+              <span style="color: #e53e3e; font-size: 14px;">{{ saveError }}</span>
+            }
           </div>
         </div>
   

@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  date_joined: string;
+}
 
 interface User {
   name: String;
@@ -35,6 +43,14 @@ export class AuthService {
   logoutFromServer() {
     const refresh = localStorage.getItem('refresh');
     return this.http.post(`${this.apiUrl}auth/logout/`, { refresh });
+  }
+
+  getUserProfile(): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}auth/me/`);
+  }
+
+  updateUserProfile(data: { username?: string; email?: string }): Observable<UserProfile> {
+    return this.http.put<UserProfile>(`${this.apiUrl}auth/me/`, data);
   }
 
   // SAVE TOKENS

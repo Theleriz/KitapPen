@@ -7,6 +7,7 @@ urlpatterns = [
     path('auth/login/', views.LoginView.as_view(), name='login'),
     path('auth/refresh/', views.RefreshTokenView.as_view(), name='token_refresh'),
     path('auth/logout/', views.LogoutView.as_view(), name='logout'),
+    path('auth/me/', views.UserProfileView.as_view(), name='user-profile'),
 
     # Books
     path('books/', views.BookListCreateView.as_view(), name='book-list-create'),

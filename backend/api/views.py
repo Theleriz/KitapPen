@@ -16,7 +16,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 from .models import Book, Note, ReadingSession
 from .serializers import (
-    RegisterSerializer, UserSerializer,
+    RegisterSerializer, UserSerializer, UserProfileUpdateSerializer,
     BookSerializer, BookDetailSerializer,
     NoteSerializer, ReadingPingRequestSerializer,
     ReadingPingResponseSerializer, ReadingStopSerializer,
@@ -55,6 +55,21 @@ class LoginView(TokenObtainPairView):
 
 class RefreshTokenView(TokenRefreshView):
     pass
+
+
+class UserProfileView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileUpdateSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(UserSerializer(request.user).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):

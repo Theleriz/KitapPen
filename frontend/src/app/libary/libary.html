@@ -20,7 +20,20 @@
     </div>
   </header>
 
-  @if (filteredBooks.length > 0) {
+  @if (loading) {
+    <div class="empty-state">
+      <p>Loading books…</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="empty-state">
+      <span class="empty-state__icon">⚠️</span>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (!loading && !error && filteredBooks.length > 0) {
     <div class="books-grid">
       @for (book of paginatedBooks; track book.id) {
         <div class="book-card">
@@ -32,13 +45,22 @@
             <h3 class="book-card__title">{{ book.title }}</h3>
             <p class="book-card__author">{{ book.author }}</p>
             <div class="book-card__meta">
-              <span class="book-card__pages">{{ book.pages }} pages</span>
+              <span class="book-card__pages">{{ book.total_pages }} pages</span>
             </div>
           </div>
 
           <div class="book-card__actions">
             <button class="btn-read">Read</button>
-            <button class="btn-add" type="button">+ Add to my library</button>
+            <button
+              class="btn-add"
+              type="button"
+              [disabled]="addedBookIds.has(book.id) || addingBookIds.has(book.id)"
+              (click)="addToMyLibrary(book)"
+            >
+              @if (addingBookIds.has(book.id)) { Adding… }
+              @else if (addedBookIds.has(book.id)) { ✓ Added }
+              @else { + Add to my library }
+            </button>
           </div>
         </div>
       }
@@ -75,7 +97,7 @@
     </div>
   }
 
-  @if (filteredBooks.length === 0) {
+  @if (!loading && !error && filteredBooks.length === 0) {
     <div class="empty-state">
       <span class="empty-state__icon">📚</span>
       <p>No books found.<br>Try a different search query.</p>

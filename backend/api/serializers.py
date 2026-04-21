@@ -6,7 +6,14 @@ from .models import Book, Note, ReadingSession
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
+        fields = ('id', 'username', 'email', 'date_joined')
+        read_only_fields = ('id', 'date_joined')
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
 
 
 class RegisterSerializer(serializers.ModelSerializer):

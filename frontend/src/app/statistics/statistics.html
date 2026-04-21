@@ -5,40 +5,54 @@
     <span class="stats-subtitle">Your reading activity overview</span>
   </header>
 
-  <!-- Summary cards -->
-  <section class="stats-cards">
-    <div class="stat-card">
-      <div class="stat-card__icon streak-icon">🔥</div>
-      <div class="stat-card__body">
-        <span class="stat-card__value">—</span>
-        <span class="stat-card__label">Day streak</span>
-      </div>
+  @if (loading) {
+    <div class="stats-cards">
+      <p>Loading statistics…</p>
     </div>
+  }
 
-    <div class="stat-card">
-      <div class="stat-card__icon time-icon">⏱</div>
-      <div class="stat-card__body">
-        <span class="stat-card__value">—</span>
-        <span class="stat-card__label">Total read time</span>
-      </div>
+  @if (error) {
+    <div class="stats-cards">
+      <p style="color: #e53e3e;">{{ error }}</p>
     </div>
+  }
 
-    <div class="stat-card">
-      <div class="stat-card__icon avg-icon">📈</div>
-      <div class="stat-card__body">
-        <span class="stat-card__value">—</span>
-        <span class="stat-card__label">Daily average</span>
+  @if (!loading) {
+    <!-- Summary cards -->
+    <section class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-card__icon streak-icon">🔥</div>
+        <div class="stat-card__body">
+          <span class="stat-card__value">{{ stats?.streak_days ?? '—' }}</span>
+          <span class="stat-card__label">Day streak</span>
+        </div>
       </div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-card__icon books-icon">📚</div>
-      <div class="stat-card__body">
-        <span class="stat-card__value">—</span>
-        <span class="stat-card__label">Books completed</span>
+      <div class="stat-card">
+        <div class="stat-card__icon time-icon">⏱</div>
+        <div class="stat-card__body">
+          <span class="stat-card__value">{{ totalHours }}</span>
+          <span class="stat-card__label">Total read time</span>
+        </div>
       </div>
-    </div>
-  </section>
+
+      <div class="stat-card">
+        <div class="stat-card__icon avg-icon">📈</div>
+        <div class="stat-card__body">
+          <span class="stat-card__value">{{ avgMinutes }} min</span>
+          <span class="stat-card__label">Daily average</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon books-icon">📚</div>
+        <div class="stat-card__body">
+          <span class="stat-card__value">{{ stats?.sessions_count ?? '—' }}</span>
+          <span class="stat-card__label">Sessions</span>
+        </div>
+      </div>
+    </section>
+  }
 
   <!-- Weekly chart -->
   <section class="stats-section">
@@ -53,7 +67,6 @@
             </div>
           }
         </div>
-        <div class="chart-empty-note">Connect to backend to load real data</div>
       </div>
     </div>
   </section>

@@ -16,6 +16,7 @@ urlpatterns = [
     path('books/public/<int:pk>/add/', views.AddPublicBookToMyLibraryView.as_view(), name='public-book-add-to-my'),
     path('books/<int:pk>/', views.BookDetailDeleteView.as_view(), name='book-detail-delete'),
     path('books/<int:pk>/stream/', views.BookStreamView.as_view(), name='book-stream'),
+    path('books/<int:pk>/progress/', views.UpdateLastPageView.as_view(), name='book-progress'),
 
     # Notes
     path('notes/', views.NoteListCreateView.as_view(), name='note-list-create'),

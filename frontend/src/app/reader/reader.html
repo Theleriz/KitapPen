@@ -1,0 +1,43 @@
+<div class="reader-page">
+
+  @if (loading && !error) {
+    <div class="reader-loading">
+      <p>Loading book…</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="reader-error">
+      <p>{{ error }}</p>
+      <button class="btn-back" (click)="goBack()">← Back to library</button>
+    </div>
+  }
+
+  @if (!loading && !error && pdfSrc) {
+    <header class="reader-header">
+      <button class="btn-back" (click)="goBack()">← My Library</button>
+      <div class="reader-title">
+        <span class="book-title">{{ book?.title }}</span>
+        <span class="book-author">{{ book?.author }}</span>
+      </div>
+      <div class="reader-nav">
+        <button class="btn-nav" (click)="prevPage()" [disabled]="currentPage <= 1">‹</button>
+        <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+        <button class="btn-nav" (click)="nextPage()" [disabled]="currentPage >= totalPages">›</button>
+      </div>
+    </header>
+
+    <div class="reader-body">
+      <pdf-viewer
+        [src]="pdfSrc"
+        [page]="currentPage"
+        [show-all]="false"
+        [original-size]="false"
+        (after-load-complete)="onLoaded($event)"
+        (pageChange)="onPageChange($event)"
+        style="display: block; width: 100%; height: 100%;">
+      </pdf-viewer>
+    </div>
+  }
+
+</div>

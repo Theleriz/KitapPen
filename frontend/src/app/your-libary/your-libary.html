@@ -111,7 +111,7 @@
             <span class="status-badge" [class]="'status-badge--' + book.status">
               {{ statusLabel(book.status) }}
             </span>
-            <button class="btn-continue">
+            <button class="btn-continue" (click)="openBook(book.id)">
               {{ book.progressPct === 0 ? 'Start reading' : 'Continue' }}
             </button>
             <button class="btn-delete" (click)="deleteBook(book.id, book.title)">

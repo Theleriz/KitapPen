@@ -213,6 +213,21 @@ class BookStreamView(APIView):
         return Response({'error': 'No PDF file available'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class UpdateLastPageView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            book = Book.objects.get(pk=pk, user=request.user)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+        page = request.data.get('last_page')
+        if page is not None:
+            book.last_page = int(page)
+            book.save(update_fields=['last_page'])
+        return Response({'last_page': book.last_page})
+
+
 # ==================== NOTES ====================
 
 class NoteListCreateView(generics.ListCreateAPIView):

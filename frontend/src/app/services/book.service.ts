@@ -45,4 +45,12 @@ export class BookService {
   getBook(bookId: number): Observable<Book> {
     return this.http.get<Book>(`${this.apiUrl}/books/${bookId}/`);
   }
+
+  getBookStream(bookId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/books/${bookId}/stream/`, { responseType: 'blob' });
+  }
+
+  updateLastPage(bookId: number, page: number): Observable<{ last_page: number }> {
+    return this.http.patch<{ last_page: number }>(`${this.apiUrl}/books/${bookId}/progress/`, { last_page: page });
+  }
 }

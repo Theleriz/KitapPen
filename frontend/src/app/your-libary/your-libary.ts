@@ -102,14 +102,17 @@ export class YourLibary implements OnInit, OnDestroy {
     this.bookService.getMyBooks().subscribe({
       next: (books: Book[]) => {
         console.log('Books loaded successfully:', books.length);
-        this.books = books.map(b => ({
-          id: b.id,
-          title: b.title,
-          author: b.author || 'Unknown Author',
-          progressPct: 0,
-          status: 'not_started',
-          pages: b.total_pages,
-        }));
+        this.books = books.map(b => {
+          const lastPage = b.last_page ?? 1;
+          const totalPages = b.total_pages ?? 0;
+          let progressPct = 0;
+          let status: ReadingStatus = 'not_started';
+          if (totalPages > 0 && lastPage > 1) {
+            progressPct = Math.min(100, Math.round((lastPage / totalPages) * 100));
+            status = progressPct >= 100 ? 'completed' : 'reading';
+          }
+          return { id: b.id, title: b.title, author: b.author || 'Unknown Author', progressPct, status, pages: totalPages };
+        });
         this.isLoading = false;
         // Reset to first page and 'all' tab after loading
         this.currentPage = 1;
@@ -271,6 +274,10 @@ export class YourLibary implements OnInit, OnDestroy {
       not_started: 'Not started',
     };
     return labels[status];
+  }
+
+  openBook(bookId: number): void {
+    this.router.navigate(['/reader', bookId]);
   }
 
   deleteBook(bookId: number, bookTitle: string): void {

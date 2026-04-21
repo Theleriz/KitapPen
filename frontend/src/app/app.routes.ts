@@ -6,6 +6,7 @@ import { Statistics } from './statistics/statistics';
 import { Profile } from './profile/profile';
 import { Settings } from './settings/settings';
 import { Login } from './login/login';
+import { Reader } from './reader/reader';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -14,6 +15,7 @@ export const routes: Routes = [
 
   { path: 'library', component: Libary, canActivate: [authGuard] },
   { path: 'my-library', component: YourLibary, canActivate: [authGuard] },
+  { path: 'reader/:id', component: Reader, canActivate: [authGuard] },
   { path: 'tracker', component: Tracker, canActivate: [authGuard] },
   { path: 'statistics', component: Statistics, canActivate: [authGuard] },
   { path: 'profile', component: Profile, canActivate: [authGuard] },

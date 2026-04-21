@@ -1,6 +1,6 @@
 @if (showNavbar) {
   <nav class="navbar">
-    <span class="navbar__brand">BookTracker</span>
+    <span class="navbar__brand">KitapPen</span>
     <div class="navbar__links">
       <a routerLink="/library" routerLinkActive="active">Library</a>
       <a routerLink="/my-library" routerLinkActive="active">My Library</a>
@@ -8,9 +8,6 @@
       <a routerLink="/statistics" routerLinkActive="active">Statistics</a>
       <a routerLink="/profile" routerLinkActive="active">Profile</a>
       <a routerLink="/settings" routerLinkActive="active">Settings</a>
-      @if (isModerator) {
-        <a routerLink="/moderator" routerLinkActive="active" class="navbar__mod-link">Moderator</a>
-      }
       <button class="navbar__logout" (click)="logout()">Logout</button>
     </div>
   </nav>

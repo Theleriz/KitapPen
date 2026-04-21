@@ -1,21 +1,18 @@
 {
   "info": {
     "name": "KitapPen API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_id": "kitappen-api-collection"
+    "description": "Full REST API collection for KitapPen — book reading tracker.\n\nUsage:\n1. Run **Auth / Login** — access & refresh tokens are saved automatically to collection variables.\n2. All other requests use {{access_token}} via the Authorization header automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8000",
-      "type": "string"
-    },
-    {
-      "key": "token",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
   ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
   "item": [
     {
       "name": "Auth",
@@ -23,98 +20,139 @@
         {
           "name": "Register",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/api/auth/register/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register", ""] },
+            "url": {
+              "raw": "{{base_url}}/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"securepass123\"\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "201 Created",
-              "status": "Created",
-              "code": 201,
-              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
-            }
-          ]
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"testpassword123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Register a new user. Returns access and refresh JWT tokens."
+          }
         },
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.access) {",
+                  "  pm.collectionVariables.set('access_token', res.access);",
+                  "  pm.collectionVariables.set('refresh_token', res.refresh);",
+                  "  console.log('Tokens saved to collection variables.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/api/auth/login/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login", ""] },
+            "url": {
+              "raw": "{{base_url}}/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"securepass123\"\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
-            }
-          ]
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpassword123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Login with username and password. Access and refresh tokens are saved automatically to collection variables {{access_token}} and {{refresh_token}}."
+          }
         },
         {
           "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.access) {",
+                  "  pm.collectionVariables.set('access_token', res.access);",
+                  "  if (res.refresh) pm.collectionVariables.set('refresh_token', res.refresh);",
+                  "  console.log('Access token refreshed.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/api/auth/refresh/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh", ""] },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"access\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "Get Current User (me)",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/auth/me/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\"\n}"
-            }
-          ]
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Refresh the access token using the refresh token. Updated tokens are saved automatically."
+          }
         },
         {
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/auth/logout/", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout", ""] },
-            "body": { "mode": "raw", "raw": "{}" }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"message\": \"Successfully logged out.\"\n}"
-            }
-          ]
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/logout/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Blacklist the refresh token (server-side logout)."
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me", ""]
+            },
+            "description": "Returns the current authenticated user's profile including role."
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"new_username\",\n  \"email\": \"new@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Update the current user's username or email."
+          }
         }
       ]
     },
@@ -122,93 +160,126 @@
       "name": "Books",
       "item": [
         {
-          "name": "List Books",
+          "name": "List My Books",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/books/", "host": ["{{baseUrl}}"], "path": ["api", "books", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Clean Code\",\n    \"author\": \"Robert C. Martin\",\n    \"pdf_file\": null,\n    \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n    \"total_pages\": 431\n  }\n]"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/books/",
+              "host": ["{{base_url}}"],
+              "path": ["books", ""]
+            },
+            "description": "Returns the current user's private book list."
+          }
         },
         {
-          "name": "Upload Book",
+          "name": "Upload Book (PDF)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/books/", "host": ["{{baseUrl}}"], "path": ["api", "books", ""] },
+            "url": {
+              "raw": "{{base_url}}/books/",
+              "host": ["{{base_url}}"],
+              "path": ["books", ""]
+            },
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "title", "value": "Clean Code", "type": "text" },
-                { "key": "author", "value": "Robert C. Martin", "type": "text" },
-                { "key": "total_pages", "value": "431", "type": "text" },
+                { "key": "title", "value": "My Book", "type": "text" },
+                { "key": "author", "value": "Author Name", "type": "text" },
                 { "key": "pdf_file", "type": "file", "src": "" }
               ]
-            }
-          },
-          "response": [
-            {
-              "name": "201 Created",
-              "status": "Created",
-              "code": 201,
-              "body": "{\n  \"id\": 1,\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"pdf_file\": \"/media/books/clean_code.pdf\",\n  \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n  \"total_pages\": 431\n}"
-            }
-          ]
+            },
+            "description": "Upload a new PDF book to the user's private library (multipart/form-data)."
+          }
+        },
+        {
+          "name": "Public Library",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/books/public/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "public", ""]
+            },
+            "description": "Returns all books in the public catalog uploaded by moderators."
+          }
+        },
+        {
+          "name": "My Library",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/books/my/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "my", ""]
+            },
+            "description": "Returns only the current user's own uploaded private books."
+          }
+        },
+        {
+          "name": "Add Public Book to My Library",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/books/public/1/add/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "public", "1", "add", ""]
+            },
+            "description": "Copy a public book into the current user's private library. Replace '1' with the public book ID."
+          }
         },
         {
           "name": "Get Book Detail",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/books/1/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"user\": 1,\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"pdf_file\": \"/media/books/clean_code.pdf\",\n  \"minio_path\": \"\",\n  \"uploaded_at\": \"2026-04-20T10:00:00Z\",\n  \"total_pages\": 431\n}"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/books/1/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "1", ""]
+            },
+            "description": "Get details of a single book. Replace '1' with the book ID."
+          }
         },
         {
           "name": "Delete Book",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/books/1/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", ""] }
-          },
-          "response": [
-            {
-              "name": "204 No Content",
-              "status": "No Content",
-              "code": 204,
-              "body": ""
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/books/1/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "1", ""]
+            },
+            "description": "Delete a book by ID. Replace '1' with the book ID."
+          }
         },
         {
-          "name": "Stream Book PDF",
+          "name": "Stream PDF",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/books/1/stream/", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", "stream", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK — PDF binary stream",
-              "status": "OK",
-              "code": 200,
-              "body": "<binary PDF content>"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/books/1/stream/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "1", "stream", ""]
+            },
+            "description": "Stream the raw PDF file. Replace '1' with the book ID."
+          }
+        },
+        {
+          "name": "Save Reading Progress",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/books/1/progress/",
+              "host": ["{{base_url}}"],
+              "path": ["books", "1", "progress", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"last_page\": 42,\n  \"total_pages\": 300\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Save the last page read and total page count for a book. Replace '1' with the book ID."
+          }
         }
       ]
     },
@@ -219,100 +290,76 @@
           "name": "List Notes",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{baseUrl}}/api/notes/?book=1",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "notes", ""],
-              "query": [{ "key": "book", "value": "1", "description": "Optional: filter by book ID" }]
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "[\n  {\n    \"id\": 1,\n    \"book\": 1,\n    \"book_title\": \"Clean Code\",\n    \"content\": \"Great chapter on functions\",\n    \"page_number\": 42,\n    \"created_at\": \"2026-04-20T12:00:00Z\",\n    \"updated_at\": \"2026-04-20T12:00:00Z\"\n  }\n]"
-            }
-          ]
+              "raw": "{{base_url}}/notes/?book=1",
+              "host": ["{{base_url}}"],
+              "path": ["notes", ""],
+              "query": [
+                { "key": "book", "value": "1", "description": "Filter by book ID (optional)" }
+              ]
+            },
+            "description": "Returns all notes for the current user. Use ?book={id} to filter by book."
+          }
         },
         {
           "name": "Create Note",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/notes/", "host": ["{{baseUrl}}"], "path": ["api", "notes", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/notes/",
+              "host": ["{{base_url}}"],
+              "path": ["notes", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"book\": 1,\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "201 Created",
-              "status": "Created",
-              "code": 201,
-              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-20T12:00:00Z\"\n}"
-            }
-          ]
+              "raw": "{\n  \"book\": 1,\n  \"content\": \"Interesting passage about...\",\n  \"page_number\": 57\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Create a new note linked to a book and optionally a page number."
+          }
         },
         {
-          "name": "Get Note Detail",
+          "name": "Get Note",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Great chapter on functions\",\n  \"page_number\": 42,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-20T12:00:00Z\"\n}"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/notes/1/",
+              "host": ["{{base_url}}"],
+              "path": ["notes", "1", ""]
+            },
+            "description": "Get a single note by ID."
+          }
         },
         {
           "name": "Update Note",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/notes/1/",
+              "host": ["{{base_url}}"],
+              "path": ["notes", "1", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"book\": 1,\n  \"content\": \"Updated note content\",\n  \"page_number\": 45\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"id\": 1,\n  \"book\": 1,\n  \"book_title\": \"Clean Code\",\n  \"content\": \"Updated note content\",\n  \"page_number\": 45,\n  \"created_at\": \"2026-04-20T12:00:00Z\",\n  \"updated_at\": \"2026-04-21T09:00:00Z\"\n}"
-            }
-          ]
+              "raw": "{\n  \"book\": 1,\n  \"content\": \"Updated note content\",\n  \"page_number\": 57\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Replace a note's content. Replace '1' with the note ID."
+          }
         },
         {
           "name": "Delete Note",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/notes/1/", "host": ["{{baseUrl}}"], "path": ["api", "notes", "1", ""] }
-          },
-          "response": [
-            {
-              "name": "204 No Content",
-              "status": "No Content",
-              "code": 204,
-              "body": ""
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/notes/1/",
+              "host": ["{{base_url}}"],
+              "path": ["notes", "1", ""]
+            },
+            "description": "Delete a note by ID."
+          }
         }
       ]
     },
@@ -320,66 +367,92 @@
       "name": "Reading",
       "item": [
         {
-          "name": "Reading Ping",
+          "name": "Ping — Reading Detection",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/reading/ping/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "ping", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/reading/ping/",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "ping", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"frame\": \"<base64-encoded-image-data>\",\n  \"session_id\": null\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"ok\": true,\n  \"reading\": true,\n  \"confidence\": 0.87,\n  \"session_id\": 5,\n  \"total_seconds\": 15\n}"
-            }
-          ]
+              "raw": "{\n  \"frame\": \"<base64_encoded_jpeg>\",\n  \"session_id\": null,\n  \"book_id\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Send a base64-encoded webcam frame to the reading detection engine.\n\nResponse: { ok, reading, confidence, session_id, total_seconds }"
+          }
         },
         {
-          "name": "Stop Reading Session",
+          "name": "Stop Session",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/reading/stop/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "stop", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/reading/stop/",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "stop", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"session_id\": 5\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"ok\": true,\n  \"total_seconds\": 180\n}"
-            }
-          ]
+              "raw": "{\n  \"session_id\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "End an active reading session and record its final duration."
+          }
         },
         {
-          "name": "Reading Stats",
+          "name": "Session History",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/reading/stats/", "host": ["{{baseUrl}}"], "path": ["api", "reading", "stats", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"total_seconds\": 7200,\n  \"streak_days\": 3,\n  \"avg_per_day\": 2400.0,\n  \"sessions_count\": 9\n}"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/reading/sessions/?page=1&page_size=5",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "sessions", ""],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "page_size", "value": "5" }
+              ]
+            },
+            "description": "Paginated list of completed reading sessions for the current user."
+          }
+        },
+        {
+          "name": "This Week",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reading/week/",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "week", ""]
+            },
+            "description": "Returns total reading seconds per day for the current week (Mon–Sun)."
+          }
+        },
+        {
+          "name": "My Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reading/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "stats", ""]
+            },
+            "description": "Returns: total_seconds, streak_days, avg_per_day, sessions_count."
+          }
+        },
+        {
+          "name": "Leaderboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reading/leaderboard/",
+              "host": ["{{base_url}}"],
+              "path": ["reading", "leaderboard", ""]
+            },
+            "description": "Top 10 users by total read time and top 10 by day streak.\n\nResponse: { time_leaders: [...], streak_leaders: [...] }\nEach entry includes: user_id, username, total_seconds / streak_days, is_current_user."
+          }
         }
       ]
     },
@@ -390,63 +463,98 @@
           "name": "Get Notification Settings",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": { "raw": "{{baseUrl}}/api/notifications/settings/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "settings", ""] }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 9,\n  \"last_sent_at\": null\n}"
-            }
-          ]
+            "url": {
+              "raw": "{{base_url}}/notifications/settings/",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "settings", ""]
+            },
+            "description": "Get email notification preferences for the current user."
+          }
         },
         {
           "name": "Update Notification Settings",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/notifications/settings/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "settings", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/notifications/settings/",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "settings", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 20\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 20,\n  \"last_sent_at\": null\n}"
-            }
-          ]
+              "raw": "{\n  \"email_notifications_enabled\": true,\n  \"reminder_hour\": 20\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Update notification preferences. reminder_hour is 0–23 (UTC)."
+          }
         },
         {
           "name": "Send Notification (Admin only)",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": { "raw": "{{baseUrl}}/api/notifications/send/", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "send", ""] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/notifications/send/",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "send", ""]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"subject\": \"Reading reminder\",\n  \"message\": \"Don't forget to read today!\",\n  \"user_ids\": [1, 2]\n}"
-            }
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"sent\": [\"testuser\"],\n  \"failed\": []\n}"
-            }
-          ]
+              "raw": "{\n  \"subject\": \"New books added!\",\n  \"message\": \"Check out the latest additions to the library.\",\n  \"user_ids\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Send an email blast to users. Leave user_ids empty [] to send to all users with notifications enabled. Requires admin/staff account."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Moderator",
+      "item": [
+        {
+          "name": "List Public Books",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/moderator/books/",
+              "host": ["{{base_url}}"],
+              "path": ["moderator", "books", ""]
+            },
+            "description": "List all books in the public library. Requires moderator or staff role."
+          }
+        },
+        {
+          "name": "Add Book to Public Library",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/moderator/books/",
+              "host": ["{{base_url}}"],
+              "path": ["moderator", "books", ""]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Public Book Title", "type": "text" },
+                { "key": "author", "value": "Author Name", "type": "text" },
+                { "key": "pdf_file", "type": "file", "src": "" }
+              ]
+            },
+            "description": "Upload a PDF to the public library. Requires moderator or staff role."
+          }
+        },
+        {
+          "name": "Delete Public Book",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/moderator/books/1/",
+              "host": ["{{base_url}}"],
+              "path": ["moderator", "books", "1", ""]
+            },
+            "description": "Remove a book from the public library. Replace '1' with the book ID. Requires moderator or staff role."
+          }
         }
       ]
     }

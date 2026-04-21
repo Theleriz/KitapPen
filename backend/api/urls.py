@@ -6,7 +6,7 @@ urlpatterns = [
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/login/', views.LoginView.as_view(), name='login'),
     path('auth/refresh/', views.RefreshTokenView.as_view(), name='token_refresh'),
-    path('auth/logout/', views.LogoutView.as_view(), name='logout'),
+    path('auth/logout/', views.logout_view, name='logout'),
     path('auth/me/', views.UserProfileView.as_view(), name='user-profile'),
 
     # Books
@@ -36,5 +36,5 @@ urlpatterns = [
 
     # Moderator
     path('moderator/books/', views.ModeratorBookListCreateView.as_view(), name='moderator-books'),
-    path('moderator/books/<int:pk>/', views.ModeratorBookDeleteView.as_view(), name='moderator-book-delete'),
+    path('moderator/books/<int:pk>/', views.moderator_book_delete_view, name='moderator-book-delete'),
 ]

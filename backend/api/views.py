@@ -90,19 +90,18 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        refresh_token = request.data.get('refresh')
-        if not refresh_token:
-            return Response({'detail': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        except TokenError:
-            return Response({'detail': 'Invalid or already blacklisted token.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_205_RESET_CONTENT)
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def logout_view(request):
+    refresh_token = request.data.get('refresh')
+    if not refresh_token:
+        return Response({'detail': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+    except TokenError:
+        return Response({'detail': 'Invalid or already blacklisted token.'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
 # ==================== BOOKS ====================
@@ -642,13 +641,12 @@ class ModeratorBookListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ModeratorBookDeleteView(APIView):
-    permission_classes = [IsModeratorUser]
-
-    def delete(self, request, pk):
-        try:
-            book = Book.objects.get(pk=pk, is_public=True)
-        except Book.DoesNotExist:
-            return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
-        book.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+@api_view(['DELETE'])
+@permission_classes([IsModeratorUser])
+def moderator_book_delete_view(request, pk):
+    try:
+        book = Book.objects.get(pk=pk, is_public=True)
+    except Book.DoesNotExist:
+        return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+    book.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

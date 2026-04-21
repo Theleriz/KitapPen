@@ -21,7 +21,6 @@
     <!-- Summary cards -->
     <section class="stats-cards">
       <div class="stat-card">
-        <div class="stat-card__icon streak-icon">🔥</div>
         <div class="stat-card__body">
           <span class="stat-card__value">{{ stats?.streak_days ?? '—' }}</span>
           <span class="stat-card__label">Day streak</span>
@@ -37,7 +36,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-card__icon avg-icon">📈</div>
         <div class="stat-card__body">
           <span class="stat-card__value">{{ avgMinutes }} min</span>
           <span class="stat-card__label">Daily average</span>
@@ -45,7 +43,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-card__icon books-icon">📚</div>
         <div class="stat-card__body">
           <span class="stat-card__value">{{ stats?.sessions_count ?? '—' }}</span>
           <span class="stat-card__label">Sessions</span>
@@ -83,7 +80,7 @@
         ⏱ Total read time
       </button>
       <button class="lb-tab" [class.lb-tab--active]="leaderboardTab === 'streak'" (click)="leaderboardTab = 'streak'">
-        🔥 Day streak
+         Day streak
       </button>
     </div>
 
@@ -92,7 +89,6 @@
         <p class="sessions-loading">Loading…</p>
       } @else if (activeLeaders.length === 0) {
         <div class="session-empty">
-          <span class="session-empty__icon">🏆</span>
           <p>No data yet. Start reading to appear on the leaderboard!</p>
         </div>
       } @else {
@@ -138,7 +134,6 @@
         <p class="sessions-loading">Loading…</p>
       } @else if (sessions.length === 0) {
         <div class="session-empty">
-          <span class="session-empty__icon">📖</span>
           <p>No sessions recorded yet.<br>Start tracking your reading to see history here.</p>
         </div>
       } @else {

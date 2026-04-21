@@ -17,12 +17,12 @@ export class Login {
   mode: 'signin' | 'signup' = 'signin';
 
   signInForm = {
-    email: '',
+    username: '',
     password: '',
   };
 
   signUpForm = {
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -37,39 +37,40 @@ export class Login {
 
   submitSignIn(): void {
     this.errorMessage = '';
-
-    const success = this.authService.signIn(
-      this.signInForm.email,
-      this.signInForm.password
-    );
-
-    if (!success) {
-      this.errorMessage = 'Please enter email and password.';
-      return;
-    }
-
-    this.router.navigate(['/library']);
+    this.authService
+      .signIn(this.signInForm.username, this.signInForm.password)
+      .subscribe({
+        next: (res) => {
+          this.authService.saveTokens(res);
+          this.router.navigate(['/library']);
+        },
+        error: () => {
+          this.errorMessage = 'Invalid username or password';
+        },
+      });
   }
 
   submitSignUp(): void {
     this.errorMessage = '';
 
     if (this.signUpForm.password !== this.signUpForm.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
+      this.errorMessage = 'Passwords do not match';
       return;
     }
 
-    const success = this.authService.signUp(
-      this.signUpForm.name,
-      this.signUpForm.email,
-      this.signUpForm.password
-    );
-
-    if (!success) {
-      this.errorMessage = 'Please fill in all fields.';
-      return;
-    }
-
-    this.router.navigate(['/library']);
+    this.authService
+      .signUp(
+        this.signUpForm.username,
+        this.signUpForm.email,
+        this.signUpForm.password
+      )
+      .subscribe({
+        next: () => {
+          this.mode = 'signin';
+        },
+        error: () => {
+          this.errorMessage = 'Registration failed. Username may already exist.';
+        },
+      });
   }
 }

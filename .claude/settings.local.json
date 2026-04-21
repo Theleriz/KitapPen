@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import os; os.environ.setdefault\\('DJANGO_SETTINGS_MODULE', 'backend.settings'\\); import django; django.setup\\(\\); from django.contrib.auth.models import User; print\\('User model fields:'\\); print\\([f.name for f in User._meta.get_fields\\(\\)]\\)\")"
+    ]
+  }
+}

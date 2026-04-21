@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError
 
 from .models import Book, Note, ReadingSession
 from .serializers import (
@@ -54,6 +55,21 @@ class LoginView(TokenObtainPairView):
 
 class RefreshTokenView(TokenRefreshView):
     pass
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({'detail': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except TokenError:
+            return Response({'detail': 'Invalid or already blacklisted token.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
 # ==================== BOOKS ====================

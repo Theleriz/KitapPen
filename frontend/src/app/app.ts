@@ -1,6 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, finalize } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ import { filter } from 'rxjs/operators';
 })
 export class App {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   currentUrl = '';
 
@@ -25,5 +27,14 @@ export class App {
 
   get showNavbar(): boolean {
     return this.currentUrl !== '/login';
+  }
+
+  logout(): void {
+    this.authService.logoutFromServer().pipe(
+      finalize(() => {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      })
+    ).subscribe({ error: () => {} });
   }
 }

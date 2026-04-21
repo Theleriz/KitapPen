@@ -41,3 +41,20 @@
   color: var(--color-accent);
   background: #eff2ff;
 }
+
+.navbar__logout {
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.navbar__logout:hover {
+  color: #e53e3e;
+  background: #fff5f5;
+}

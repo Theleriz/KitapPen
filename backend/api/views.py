@@ -22,7 +22,8 @@ from .serializers import (
     BookSerializer, BookDetailSerializer,
     NoteSerializer, ReadingPingRequestSerializer,
     ReadingPingResponseSerializer, ReadingStopSerializer,
-    ReadingStatsSerializer, NotificationSettingsSerializer
+    ReadingStatsSerializer, NotificationSettingsSerializer,
+    ReadingSessionListSerializer
 )
 from .detector import analyze_frame
 
@@ -276,6 +277,7 @@ class ReadingPingView(APIView):
 
         frame = serializer.validated_data['frame']
         session_id = serializer.validated_data.get('session_id')
+        book_id = serializer.validated_data.get('book_id')
 
         # Detect reading from frame
         is_reading, confidence = analyze_frame(frame)
@@ -296,13 +298,19 @@ class ReadingPingView(APIView):
         if is_reading:
             if not session:
                 # Start new session
+                book = None
+                if book_id:
+                    try:
+                        book = Book.objects.get(id=book_id, user=request.user)
+                    except Book.DoesNotExist:
+                        pass
                 session = ReadingSession.objects.create(
                     user=request.user,
+                    book=book,
                     is_active=True
                 )
             else:
-                # Update session time (assuming ping every 5 seconds)
-                session.total_seconds += 5
+                session.total_seconds += 2
                 session.save()
             session_id = session.id
             total_seconds = session.total_seconds
@@ -351,6 +359,63 @@ class ReadingStopView(APIView):
                 {'error': 'Active session not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class ReadingSessionsListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        page = max(1, int(request.query_params.get('page', 1)))
+        page_size = min(50, max(1, int(request.query_params.get('page_size', 5))))
+
+        sessions = ReadingSession.objects.filter(
+            user=request.user,
+            is_active=False,
+        )
+        total = sessions.count()
+        offset = (page - 1) * page_size
+        serializer = ReadingSessionListSerializer(
+            sessions[offset:offset + page_size], many=True
+        )
+        return Response({
+            'results': serializer.data,
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': max(1, (total + page_size - 1) // page_size),
+        })
+
+
+class ReadingWeekView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from django.db.models.functions import TruncDate
+        today = timezone.now().date()
+        start_of_week = today - timedelta(days=today.weekday())
+
+        sessions = ReadingSession.objects.filter(
+            user=request.user,
+            is_active=False,
+            started_at__date__gte=start_of_week,
+        )
+
+        daily = (
+            sessions
+            .annotate(day=TruncDate('started_at'))
+            .values('day')
+            .annotate(total=Sum('total_seconds'))
+        )
+        days_map = {entry['day']: entry['total'] for entry in daily}
+
+        result = [
+            {
+                'date': (start_of_week + timedelta(days=i)).isoformat(),
+                'total_seconds': days_map.get(start_of_week + timedelta(days=i), 0),
+            }
+            for i in range(7)
+        ]
+        return Response({'days': result})
 
 
 class ReadingStatsView(APIView):

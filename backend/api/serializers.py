@@ -85,6 +85,7 @@ class ReadingStatsSerializer(serializers.Serializer):
 class ReadingPingRequestSerializer(serializers.Serializer):
     frame = serializers.CharField(required=True)
     session_id = serializers.IntegerField(required=False, allow_null=True)
+    book_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 class ReadingPingResponseSerializer(serializers.Serializer):
@@ -97,6 +98,21 @@ class ReadingPingResponseSerializer(serializers.Serializer):
 
 class ReadingStopSerializer(serializers.Serializer):
     session_id = serializers.IntegerField(required=True)
+
+
+class ReadingSessionListSerializer(serializers.ModelSerializer):
+    book_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ReadingSession
+        fields = ('id', 'started_at', 'ended_at', 'total_seconds', 'book_title')
+
+    def get_book_title(self, obj):
+        if obj.book:
+            return obj.book.title
+        if obj.admin_book:
+            return obj.admin_book.title
+        return None
 
 
 class NotificationSettingsSerializer(serializers.ModelSerializer):

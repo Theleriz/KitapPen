@@ -23,6 +23,8 @@ urlpatterns = [
     path('notes/<int:pk>/', views.NoteDetailUpdateDeleteView.as_view(), name='note-detail-update-delete'),
 
     # Reading
+    path('reading/sessions/', views.ReadingSessionsListView.as_view(), name='reading-sessions'),
+    path('reading/week/', views.ReadingWeekView.as_view(), name='reading-week'),
     path('reading/ping/', views.ReadingPingView.as_view(), name='reading-ping'),
     path('reading/stop/', views.ReadingStopView.as_view(), name='reading-stop'),
     path('reading/stats/', views.ReadingStatsView.as_view(), name='reading-stats'),

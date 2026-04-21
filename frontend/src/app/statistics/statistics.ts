@@ -1,10 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ReadingService, ReadingStats } from '../services/reading.service';
+import { forkJoin } from 'rxjs';
+import { ReadingService, ReadingStats, SessionItem } from '../services/reading.service';
 
 interface WeekDay {
   label: string;
   heightPct: number;
+  minutes: number;
 }
+
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-statistics',
@@ -15,31 +20,78 @@ interface WeekDay {
 export class Statistics implements OnInit {
   private readingService = inject(ReadingService);
 
-  weekDays: WeekDay[] = [
-    { label: 'Mon', heightPct: 0 },
-    { label: 'Tue', heightPct: 0 },
-    { label: 'Wed', heightPct: 0 },
-    { label: 'Thu', heightPct: 0 },
-    { label: 'Fri', heightPct: 0 },
-    { label: 'Sat', heightPct: 0 },
-    { label: 'Sun', heightPct: 0 },
-  ];
+  weekDays: WeekDay[] = DAY_LABELS.map((label) => ({ label, heightPct: 0, minutes: 0 }));
 
   stats: ReadingStats | null = null;
   loading = false;
   error = '';
 
+  sessions: SessionItem[] = [];
+  sessionsPage = 1;
+  sessionsTotalPages = 1;
+  sessionsLoading = false;
+
   ngOnInit(): void {
     this.loading = true;
-    this.readingService.getStats().subscribe({
-      next: (data) => {
-        this.stats = data;
+    forkJoin({
+      stats: this.readingService.getStats(),
+      week: this.readingService.getWeekStats(),
+    }).subscribe({
+      next: ({ stats, week }) => {
+        this.stats = stats;
+        const max = Math.max(...week.days.map((d) => d.total_seconds), 1);
+        this.weekDays = week.days.map((d, i) => ({
+          label: DAY_LABELS[i],
+          heightPct: Math.round((d.total_seconds / max) * 100),
+          minutes: Math.round(d.total_seconds / 60),
+        }));
         this.loading = false;
       },
       error: () => {
         this.error = 'Failed to load statistics.';
         this.loading = false;
-      }
+      },
+    });
+    this.loadSessions(1);
+  }
+
+  loadSessions(page: number): void {
+    this.sessionsLoading = true;
+    this.readingService.getSessions(page, PAGE_SIZE).subscribe({
+      next: (data) => {
+        this.sessions = data.results;
+        this.sessionsPage = data.page;
+        this.sessionsTotalPages = data.total_pages;
+        this.sessionsLoading = false;
+      },
+      error: () => (this.sessionsLoading = false),
+    });
+  }
+
+  prevPage(): void {
+    if (this.sessionsPage > 1) this.loadSessions(this.sessionsPage - 1);
+  }
+
+  nextPage(): void {
+    if (this.sessionsPage < this.sessionsTotalPages) this.loadSessions(this.sessionsPage + 1);
+  }
+
+  formatDuration(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   }
 

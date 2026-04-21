@@ -51,9 +51,12 @@
       <!-- Book selector -->
       <div class="control-block">
         <label class="control-label" for="book-select">Book</label>
-        <select id="book-select" class="control-select" [disabled]="isTracking">
-          <option value="" disabled selected>Select a book…</option>
-          <!-- options loaded from API -->
+        <select id="book-select" class="control-select"
+                [(ngModel)]="selectedBookId" [disabled]="isTracking">
+          <option [ngValue]="null" disabled>Select a book…</option>
+          @for (book of books; track book.id) {
+            <option [ngValue]="book.id">{{ book.title }}</option>
+          }
         </select>
       </div>
 

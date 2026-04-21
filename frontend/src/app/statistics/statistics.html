@@ -62,6 +62,9 @@
         <div class="chart-bars">
           @for (day of weekDays; track day.label) {
             <div class="chart-bar-wrap">
+              @if (day.minutes > 0) {
+                <span class="chart-bar__minutes">{{ day.minutes }}m</span>
+              }
               <div class="chart-bar" [style.height.%]="day.heightPct"></div>
               <span class="chart-bar__label">{{ day.label }}</span>
             </div>
@@ -74,11 +77,38 @@
   <!-- Recent sessions -->
   <section class="stats-section">
     <h2 class="section-title">Recent sessions</h2>
-    <div class="sessions-list">
-      <div class="session-empty">
-        <span class="session-empty__icon">📖</span>
-        <p>No sessions recorded yet.<br>Start tracking your reading to see history here.</p>
-      </div>
+
+    <div class="sessions-card">
+      @if (sessionsLoading) {
+        <p class="sessions-loading">Loading…</p>
+      } @else if (sessions.length === 0) {
+        <div class="session-empty">
+          <span class="session-empty__icon">📖</span>
+          <p>No sessions recorded yet.<br>Start tracking your reading to see history here.</p>
+        </div>
+      } @else {
+        <ul class="session-list">
+          @for (s of sessions; track s.id) {
+            <li class="session-item">
+              <div class="session-item__left">
+                <span class="session-item__book">{{ s.book_title ?? 'No book' }}</span>
+                <span class="session-item__date">{{ formatDate(s.started_at) }}</span>
+              </div>
+              <span class="session-item__duration">{{ formatDuration(s.total_seconds) }}</span>
+            </li>
+          }
+        </ul>
+
+        <div class="pagination">
+          <button class="pagination__btn" (click)="prevPage()" [disabled]="sessionsPage <= 1">
+            ‹ Prev
+          </button>
+          <span class="pagination__info">{{ sessionsPage }} / {{ sessionsTotalPages }}</span>
+          <button class="pagination__btn" (click)="nextPage()" [disabled]="sessionsPage >= sessionsTotalPages">
+            Next ›
+          </button>
+        </div>
+      }
     </div>
   </section>
 

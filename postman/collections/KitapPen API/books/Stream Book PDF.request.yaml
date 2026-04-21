@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/books/:bookId/stream/'
+order: 5000
+pathVariables:
+  - key: bookId
+    value: '{{bookId}}'

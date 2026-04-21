@@ -1,0 +1,18 @@
+$kind: collection
+name: 'KitapPen API'
+variables:
+  - key: baseUrl
+    value: 'http://127.0.0.1:8000/api'
+  - key: accessToken
+    value: ''
+  - key: refreshToken
+    value: ''
+  - key: bookId
+    value: '1'
+  - key: noteId
+    value: '1'
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'

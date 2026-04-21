@@ -12,8 +12,8 @@ export class Profile {
   private authService = inject(AuthService);
 
   profile = {
-    name: this.authService.currentUser()?.name || 'Emma Carter',
-    email: this.authService.currentUser()?.email || 'emma.carter@example.com',
+    name: 'Emma Carter',
+    email: 'emma.carter@example.com',
     bio: 'Passionate reader who enjoys fiction, classics, and productivity books.',
     favoriteGenre: 'Fiction',
     joinedDate: 'March 2026',

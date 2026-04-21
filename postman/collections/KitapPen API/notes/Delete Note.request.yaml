@@ -1,0 +1,10 @@
+$kind: http-request
+method: DELETE
+url: '{{baseUrl}}/notes/:noteId/'
+order: 6000
+headers:
+  - key: Authorization
+    value: 'Bearer {{accessToken}}'
+pathVariables:
+  - key: noteId
+    value: '{{noteId}}'

@@ -1,0 +1,17 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/notes/'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{accessToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "book": {{bookId}},
+      "content": "Remember this quote for later.",
+      "page_number": 42
+    }

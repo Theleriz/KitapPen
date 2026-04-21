@@ -19,6 +19,7 @@ export class Libary {
   currentPage = 1;
   readonly pageSize = 4;
 
+  // Admin catalog (static demo list)
   books: Book[] = [
     { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', pages: 180 },
     { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee', pages: 281 },

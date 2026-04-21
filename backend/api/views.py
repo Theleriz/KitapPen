@@ -1,6 +1,7 @@
 import base64
 import io
 from datetime import datetime, timedelta
+import mimetypes
 from django.utils import timezone
 from django.db.models import Sum, Count, Avg
 from django.contrib.auth.models import User
@@ -63,12 +64,64 @@ class BookListCreateView(generics.ListCreateAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
-        return Book.objects.filter(user=self.request.user)
+        # My Library list (uploaded/owned by the current user)
+        return Book.objects.filter(user=self.request.user, is_public=False)
 
     def perform_create(self, serializer):
-        book = serializer.save(user=self.request.user)
+        # Upload into My Library
+        book = serializer.save(user=self.request.user, is_public=False, last_page=1)
         # TODO: Upload to MinIO here if configured
         return book
+
+
+class PublicBooksView(generics.ListAPIView):
+    """Library (admin/public catalog)."""
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Book.objects.filter(is_public=True)
+
+
+class MyBooksView(generics.ListAPIView):
+    """My Library (current user's private books)."""
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Book.objects.filter(user=self.request.user, is_public=False)
+
+
+class AddPublicBookToMyLibraryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk: int):
+        try:
+            public_book = Book.objects.get(pk=pk, is_public=True)
+        except Book.DoesNotExist:
+            return Response({'error': 'Public book not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # If the user already added this exact file, return existing record.
+        existing_qs = Book.objects.filter(user=request.user, is_public=False)
+        if public_book.minio_path:
+            existing_qs = existing_qs.filter(minio_path=public_book.minio_path)
+        elif public_book.pdf_file:
+            existing_qs = existing_qs.filter(pdf_file=public_book.pdf_file.name)
+        existing = existing_qs.first()
+        if existing:
+            return Response(BookSerializer(existing).data, status=status.HTTP_200_OK)
+
+        user_book = Book.objects.create(
+            user=request.user,
+            title=public_book.title,
+            author=public_book.author,
+            pdf_file=public_book.pdf_file,
+            minio_path=public_book.minio_path,
+            total_pages=public_book.total_pages,
+            last_page=1,
+            is_public=False,
+        )
+        return Response(BookSerializer(user_book).data, status=status.HTTP_201_CREATED)
 
 
 class BookDetailDeleteView(generics.RetrieveDestroyAPIView):
@@ -116,11 +169,14 @@ class BookStreamView(APIView):
                     while chunk := f.read(chunk_size):
                         yield chunk
 
+            content_type, _ = mimetypes.guess_type(book.pdf_file.name)
+            content_type = content_type or 'application/octet-stream'
             response = StreamingHttpResponse(
                 file_iterator(book.pdf_file),
-                content_type='application/pdf'
+                content_type=content_type
             )
-            response['Content-Disposition'] = f'inline; filename="{book.title}.pdf"'
+            filename = book.pdf_file.name.split("/")[-1]
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
 
         return Response({'error': 'No PDF file available'}, status=status.HTTP_404_NOT_FOUND)

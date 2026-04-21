@@ -27,9 +27,9 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = 'django-insecure-$gccx7d1^9qwy_zmivj_piqcc!h*8#fl0u&0dk*)8r=^s^dk#0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
 
 
 # Application definition
@@ -151,7 +151,7 @@ SIMPLE_JWT = {
 }
 
 # MinIO settings (configure as needed)
-MINIO_ENDPOINT = 'localhost:9000'
+MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT', 'localhost:9000')
 MINIO_ACCESS_KEY = 'minioadmin'
 MINIO_SECRET_KEY = 'minioadmin'
 MINIO_BUCKET_NAME = 'books'

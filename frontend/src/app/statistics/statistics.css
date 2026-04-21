@@ -148,6 +148,115 @@
   padding-top: 2px;
 }
 
+/* ── Leaderboard ─────────────────────────────── */
+.lb-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lb-tab {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.lb-tab:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.lb-tab--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.lb-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--color-card-shadow);
+  overflow: hidden;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lb-th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lb-th--rank,
+.lb-td--rank {
+  width: 48px;
+  text-align: center;
+}
+
+.lb-th--value,
+.lb-td--value {
+  text-align: right;
+}
+
+.lb-td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lb-row:last-child .lb-td {
+  border-bottom: none;
+}
+
+.lb-td--rank {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lb-td--name {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-td--value {
+  font-weight: 700;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.lb-row--me .lb-td {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.lb-you {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
 /* ── Sessions list ───────────────────────────── */
 .sessions-card {
   background: var(--color-card-bg);

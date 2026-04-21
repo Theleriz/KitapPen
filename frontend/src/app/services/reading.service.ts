@@ -42,6 +42,19 @@ export interface SessionsPage {
   total_pages: number;
 }
 
+export interface LeaderboardEntry {
+  user_id: number;
+  username: string;
+  total_seconds?: number;
+  streak_days?: number;
+  is_current_user: boolean;
+}
+
+export interface Leaderboard {
+  time_leaders: LeaderboardEntry[];
+  streak_leaders: LeaderboardEntry[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReadingService {
   private apiUrl = 'http://127.0.0.1:8000/api';
@@ -74,5 +87,9 @@ export class ReadingService {
     return this.http.post<StopResponse>(`${this.apiUrl}/reading/stop/`, {
       session_id: sessionId
     });
+  }
+
+  getLeaderboard(): Observable<Leaderboard> {
+    return this.http.get<Leaderboard>(`${this.apiUrl}/reading/leaderboard/`);
   }
 }

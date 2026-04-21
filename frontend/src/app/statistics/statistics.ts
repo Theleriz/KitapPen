@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { ReadingService, ReadingStats, SessionItem } from '../services/reading.service';
+import { ReadingService, ReadingStats, SessionItem, LeaderboardEntry } from '../services/reading.service';
 
 interface WeekDay {
   label: string;
@@ -31,6 +31,11 @@ export class Statistics implements OnInit {
   sessionsTotalPages = 1;
   sessionsLoading = false;
 
+  timeLeaders: LeaderboardEntry[] = [];
+  streakLeaders: LeaderboardEntry[] = [];
+  leaderboardTab: 'time' | 'streak' = 'time';
+  leaderboardLoading = false;
+
   ngOnInit(): void {
     this.loading = true;
     forkJoin({
@@ -53,6 +58,23 @@ export class Statistics implements OnInit {
       },
     });
     this.loadSessions(1);
+    this.loadLeaderboard();
+  }
+
+  loadLeaderboard(): void {
+    this.leaderboardLoading = true;
+    this.readingService.getLeaderboard().subscribe({
+      next: (data) => {
+        this.timeLeaders = data.time_leaders;
+        this.streakLeaders = data.streak_leaders;
+        this.leaderboardLoading = false;
+      },
+      error: () => (this.leaderboardLoading = false),
+    });
+  }
+
+  get activeLeaders(): LeaderboardEntry[] {
+    return this.leaderboardTab === 'time' ? this.timeLeaders : this.streakLeaders;
   }
 
   loadSessions(page: number): void {

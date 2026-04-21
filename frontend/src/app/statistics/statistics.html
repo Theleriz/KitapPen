@@ -74,6 +74,61 @@
     </div>
   </section>
 
+  <!-- Leaderboard -->
+  <section class="stats-section">
+    <h2 class="section-title">Leaderboard — Top 10</h2>
+
+    <div class="lb-tabs">
+      <button class="lb-tab" [class.lb-tab--active]="leaderboardTab === 'time'" (click)="leaderboardTab = 'time'">
+        ⏱ Total read time
+      </button>
+      <button class="lb-tab" [class.lb-tab--active]="leaderboardTab === 'streak'" (click)="leaderboardTab = 'streak'">
+        🔥 Day streak
+      </button>
+    </div>
+
+    <div class="lb-card">
+      @if (leaderboardLoading) {
+        <p class="sessions-loading">Loading…</p>
+      } @else if (activeLeaders.length === 0) {
+        <div class="session-empty">
+          <span class="session-empty__icon">🏆</span>
+          <p>No data yet. Start reading to appear on the leaderboard!</p>
+        </div>
+      } @else {
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th class="lb-th lb-th--rank">#</th>
+              <th class="lb-th">User</th>
+              <th class="lb-th lb-th--value">
+                @if (leaderboardTab === 'time') { Read time } @else { Streak }
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of activeLeaders; track entry.user_id; let i = $index) {
+              <tr class="lb-row" [class.lb-row--me]="entry.is_current_user">
+                <td class="lb-td lb-td--rank">{{ i + 1 }}</td>
+                <td class="lb-td lb-td--name">
+                  {{ entry.username }}
+                  @if (entry.is_current_user) { <span class="lb-you">you</span> }
+                </td>
+                <td class="lb-td lb-td--value">
+                  @if (leaderboardTab === 'time') {
+                    {{ formatDuration(entry.total_seconds ?? 0) }}
+                  } @else {
+                    {{ entry.streak_days ?? 0 }} days
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </section>
+
   <!-- Recent sessions -->
   <section class="stats-section">
     <h2 class="section-title">Recent sessions</h2>

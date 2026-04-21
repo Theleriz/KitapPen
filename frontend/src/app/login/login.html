@@ -7,42 +7,33 @@
     </div>
 
     <div class="auth-tabs">
-      <button
-        type="button"
-        class="auth-tab"
+      <button type="button" class="auth-tab"
         [class.auth-tab--active]="mode === 'signin'"
-        (click)="setMode('signin')"
-      >
+        (click)="setMode('signin')">
         Sign in
       </button>
-
-      <button
-        type="button"
-        class="auth-tab"
+      <button type="button" class="auth-tab"
         [class.auth-tab--active]="mode === 'signup'"
-        (click)="setMode('signup')"
-      >
+        (click)="setMode('signup')">
         Sign up
       </button>
     </div>
 
     @if (errorMessage) {
-      <div class="auth-error">
-        {{ errorMessage }}
-      </div>
+      <div class="auth-error">{{ errorMessage }}</div>
     }
 
     @if (mode === 'signin') {
       <form class="auth-form" (ngSubmit)="submitSignIn()">
         <div class="form-block">
-          <label class="form-label" for="signin-email">Email</label>
+          <label class="form-label" for="signin-username">Username</label>
           <input
-            id="signin-email"
-            type="email"
+            id="signin-username"
+            type="text"
             class="form-input"
-            [(ngModel)]="signInForm.email"
-            name="signinEmail"
-            placeholder="Enter your email"
+            [(ngModel)]="signInForm.username"
+            name="signinUsername"
+            placeholder="Enter your username"
           />
         </div>
 
@@ -65,14 +56,14 @@
     @if (mode === 'signup') {
       <form class="auth-form" (ngSubmit)="submitSignUp()">
         <div class="form-block">
-          <label class="form-label" for="signup-name">Full name</label>
+          <label class="form-label" for="signup-username">Username</label>
           <input
-            id="signup-name"
+            id="signup-username"
             type="text"
             class="form-input"
-            [(ngModel)]="signUpForm.name"
-            name="signupName"
-            placeholder="Enter your full name"
+            [(ngModel)]="signUpForm.username"
+            name="signupUsername"
+            placeholder="Choose a username"
           />
         </div>
 

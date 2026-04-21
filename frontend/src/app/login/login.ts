@@ -30,6 +30,29 @@ export class Login {
 
   errorMessage = '';
 
+  private setApiError(err: any, fallback: string): void {
+    const data = err?.error;
+    if (typeof data === 'string' && data.trim()) {
+      this.errorMessage = data;
+      return;
+    }
+    if (data && typeof data === 'object') {
+      const messages: string[] = [];
+      for (const [field, value] of Object.entries(data)) {
+        if (Array.isArray(value)) {
+          for (const v of value) messages.push(`${field}: ${v}`);
+        } else if (typeof value === 'string') {
+          messages.push(`${field}: ${value}`);
+        }
+      }
+      if (messages.length) {
+        this.errorMessage = messages.join('\n');
+        return;
+      }
+    }
+    this.errorMessage = fallback;
+  }
+
   setMode(mode: 'signin' | 'signup'): void {
     this.mode = mode;
     this.errorMessage = '';
@@ -44,8 +67,8 @@ export class Login {
           this.authService.saveTokens(res);
           this.router.navigate(['/library']);
         },
-        error: () => {
-          this.errorMessage = 'Invalid username or password';
+        error: (err) => {
+          this.setApiError(err, 'Invalid username or password');
         },
       });
   }
@@ -65,11 +88,18 @@ export class Login {
         this.signUpForm.password
       )
       .subscribe({
-        next: () => {
+        next: (res) => {
+          // Backend returns tokens on successful registration
+          if (res?.access) {
+            this.authService.saveTokens(res);
+            this.router.navigate(['/library']);
+            return;
+          }
+          // Fallback: allow user to sign in manually
           this.mode = 'signin';
         },
-        error: () => {
-          this.errorMessage = 'Registration failed. Username may already exist.';
+        error: (err) => {
+          this.setApiError(err, 'Registration failed.');
         },
       });
   }

@@ -26,17 +26,30 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_public = serializers.BooleanField(read_only=True)
+    last_page = serializers.IntegerField(read_only=True)
     class Meta:
         model = Book
-        fields = ('id', 'title', 'author', 'pdf_file', 'uploaded_at', 'total_pages')
-        read_only_fields = ('uploaded_at',)
+        fields = ('id', 'user', 'title', 'author', 'pdf_file', 'uploaded_at', 'total_pages', 'last_page', 'is_public')
+        read_only_fields = ('uploaded_at', 'user', 'last_page', 'is_public')
+
+    def validate_pdf_file(self, file):
+        if not file:
+            raise serializers.ValidationError("File is required")
+        if getattr(file, "size", 0) <= 0:
+            raise serializers.ValidationError("File is empty")
+        return file
 
 
 class BookDetailSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_public = serializers.BooleanField(read_only=True)
+    last_page = serializers.IntegerField(read_only=True)
     class Meta:
         model = Book
-        fields = ('id', 'user', 'title', 'author', 'pdf_file', 'minio_path', 'uploaded_at', 'total_pages')
-        read_only_fields = ('user', 'uploaded_at')
+        fields = ('id', 'user', 'title', 'author', 'pdf_file', 'minio_path', 'uploaded_at', 'total_pages', 'last_page', 'is_public')
+        read_only_fields = ('user', 'uploaded_at', 'last_page', 'is_public')
 
 
 class NoteSerializer(serializers.ModelSerializer):

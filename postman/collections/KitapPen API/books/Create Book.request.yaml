@@ -1,0 +1,19 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/books/'
+order: 2000
+body:
+  type: formdata
+  content:
+    - key: title
+      type: text
+      value: 'Atomic Habits'
+    - key: author
+      type: text
+      value: 'James Clear'
+    - key: total_pages
+      type: text
+      value: '320'
+    - key: pdf_file
+      type: file
+      src: './sample.pdf'

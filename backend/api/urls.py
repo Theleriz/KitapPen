@@ -9,6 +9,9 @@ urlpatterns = [
 
     # Books
     path('books/', views.BookListCreateView.as_view(), name='book-list-create'),
+    path('books/public/', views.PublicBooksView.as_view(), name='public-books'),
+    path('books/my/', views.MyBooksView.as_view(), name='my-books'),
+    path('books/public/<int:pk>/add/', views.AddPublicBookToMyLibraryView.as_view(), name='public-book-add-to-my'),
     path('books/<int:pk>/', views.BookDetailDeleteView.as_view(), name='book-detail-delete'),
     path('books/<int:pk>/stream/', views.BookStreamView.as_view(), name='book-stream'),
 

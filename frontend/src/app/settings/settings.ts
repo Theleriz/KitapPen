@@ -1,7 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -10,9 +8,6 @@ import { AuthService } from '../auth.service';
   styleUrl: './settings.css',
 })
 export class Settings {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
   settings = {
     darkMode: false,
     emailNotifications: true,
@@ -20,17 +15,9 @@ export class Settings {
     autoplayTracking: false,
     language: 'English',
     dailyGoal: 30,
-    timezone: 'Asia/Almaty',
-    weekStartsOn: 'Monday',
   };
 
   saveSettings(): void {
-    localStorage.setItem('booktracker_settings', JSON.stringify(this.settings));
     console.log('Settings saved', this.settings);
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

@@ -1,49 +1,15 @@
 <div class="settings-page">
 
-  <header class="settings-header">
-    <h1 class="settings-title">Settings</h1>
-    <span class="settings-subtitle">Customize your reading experience</span>
-  </header>
-
-  <div class="settings-layout">
-
-    <!-- Left summary card -->
-    <div class="settings-summary-card">
-      <div class="settings-avatar">
-        S
-      </div>
-
-      <h2 class="settings-user-title">Session</h2>
-      <p class="settings-user-subtitle">Manage your account access and app basics</p>
-
-      <div class="settings-meta">
-        <div class="settings-meta__item">
-          <span class="settings-meta__label">Language</span>
-          <span class="settings-meta__value">{{ settings.language }}</span>
-        </div>
-
-        <div class="settings-meta__item">
-          <span class="settings-meta__label">Daily goal</span>
-          <span class="settings-meta__value">{{ settings.dailyGoal }} min</span>
-        </div>
-
-        <div class="settings-meta__item">
-          <span class="settings-meta__label">Reminders</span>
-          <span class="settings-meta__value">
-            {{ settings.readingReminders ? 'Enabled' : 'Disabled' }}
-          </span>
-        </div>
-      </div>
-
-      <button class="btn-logout" (click)="logout()">Logout</button>
-    </div>
-
-    <!-- Right main column -->
-    <div class="settings-main-col">
-
+    <header class="settings-header">
+      <h1 class="settings-title">Settings</h1>
+      <span class="settings-subtitle">Customize your reading experience</span>
+    </header>
+  
+    <div class="settings-layout">
+  
       <div class="settings-card">
         <h3 class="card-title">Preferences</h3>
-
+  
         <div class="setting-row">
           <div class="setting-row__text">
             <span class="setting-row__title">Dark mode</span>
@@ -54,7 +20,7 @@
             <span class="switch-slider"></span>
           </label>
         </div>
-
+  
         <div class="setting-row">
           <div class="setting-row__text">
             <span class="setting-row__title">Email notifications</span>
@@ -65,7 +31,7 @@
             <span class="switch-slider"></span>
           </label>
         </div>
-
+  
         <div class="setting-row">
           <div class="setting-row__text">
             <span class="setting-row__title">Reading reminders</span>
@@ -76,7 +42,7 @@
             <span class="switch-slider"></span>
           </label>
         </div>
-
+  
         <div class="setting-row">
           <div class="setting-row__text">
             <span class="setting-row__title">Autostart tracking</span>
@@ -88,10 +54,10 @@
           </label>
         </div>
       </div>
-
+  
       <div class="settings-card">
-        <h3 class="card-title">Localization</h3>
-
+        <h3 class="card-title">General</h3>
+  
         <div class="form-grid">
           <div class="form-block">
             <label class="form-label" for="language">Language</label>
@@ -105,7 +71,7 @@
               <option>Kazakh</option>
             </select>
           </div>
-
+  
           <div class="form-block">
             <label class="form-label" for="goal">Daily reading goal (minutes)</label>
             <input
@@ -115,38 +81,12 @@
               [(ngModel)]="settings.dailyGoal"
             />
           </div>
-
-          <div class="form-block">
-            <label class="form-label" for="timezone">Timezone</label>
-            <select
-              id="timezone"
-              class="form-select"
-              [(ngModel)]="settings.timezone"
-            >
-              <option>Asia/Almaty</option>
-              <option>Asia/Astana</option>
-              <option>UTC</option>
-            </select>
-          </div>
-
-          <div class="form-block">
-            <label class="form-label" for="weekStartsOn">Week starts on</label>
-            <select
-              id="weekStartsOn"
-              class="form-select"
-              [(ngModel)]="settings.weekStartsOn"
-            >
-              <option>Monday</option>
-              <option>Sunday</option>
-            </select>
-          </div>
         </div>
-
+  
         <div class="card-actions">
           <button class="btn-save" (click)="saveSettings()">Save settings</button>
         </div>
       </div>
-
+  
     </div>
   </div>
-</div>

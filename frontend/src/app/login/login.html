@@ -1,0 +1,119 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <span class="auth-brand">BookTracker</span>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Track your reading journey in one place</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button
+        type="button"
+        class="auth-tab"
+        [class.auth-tab--active]="mode === 'signin'"
+        (click)="setMode('signin')"
+      >
+        Sign in
+      </button>
+
+      <button
+        type="button"
+        class="auth-tab"
+        [class.auth-tab--active]="mode === 'signup'"
+        (click)="setMode('signup')"
+      >
+        Sign up
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <div class="auth-error">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (mode === 'signin') {
+      <form class="auth-form" (ngSubmit)="submitSignIn()">
+        <div class="form-block">
+          <label class="form-label" for="signin-email">Email</label>
+          <input
+            id="signin-email"
+            type="email"
+            class="form-input"
+            [(ngModel)]="signInForm.email"
+            name="signinEmail"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div class="form-block">
+          <label class="form-label" for="signin-password">Password</label>
+          <input
+            id="signin-password"
+            type="password"
+            class="form-input"
+            [(ngModel)]="signInForm.password"
+            name="signinPassword"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button type="submit" class="auth-button">Sign in</button>
+      </form>
+    }
+
+    @if (mode === 'signup') {
+      <form class="auth-form" (ngSubmit)="submitSignUp()">
+        <div class="form-block">
+          <label class="form-label" for="signup-name">Full name</label>
+          <input
+            id="signup-name"
+            type="text"
+            class="form-input"
+            [(ngModel)]="signUpForm.name"
+            name="signupName"
+            placeholder="Enter your full name"
+          />
+        </div>
+
+        <div class="form-block">
+          <label class="form-label" for="signup-email">Email</label>
+          <input
+            id="signup-email"
+            type="email"
+            class="form-input"
+            [(ngModel)]="signUpForm.email"
+            name="signupEmail"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div class="form-block">
+          <label class="form-label" for="signup-password">Password</label>
+          <input
+            id="signup-password"
+            type="password"
+            class="form-input"
+            [(ngModel)]="signUpForm.password"
+            name="signupPassword"
+            placeholder="Create password"
+          />
+        </div>
+
+        <div class="form-block">
+          <label class="form-label" for="signup-confirm-password">Confirm password</label>
+          <input
+            id="signup-confirm-password"
+            type="password"
+            class="form-input"
+            [(ngModel)]="signUpForm.confirmPassword"
+            name="signupConfirmPassword"
+            placeholder="Repeat password"
+          />
+        </div>
+
+        <button type="submit" class="auth-button">Create account</button>
+      </form>
+    }
+  </div>
+</div>

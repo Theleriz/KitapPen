@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -8,9 +9,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './profile.css',
 })
 export class Profile {
+  private authService = inject(AuthService);
+
   profile = {
-    name: 'Emma Carter',
-    email: 'emma.carter@example.com',
+    name: this.authService.currentUser()?.name || 'Emma Carter',
+    email: this.authService.currentUser()?.email || 'emma.carter@example.com',
     bio: 'Passionate reader who enjoys fiction, classics, and productivity books.',
     favoriteGenre: 'Fiction',
     joinedDate: 'March 2026',

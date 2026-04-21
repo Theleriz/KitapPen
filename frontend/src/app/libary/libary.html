@@ -6,6 +6,7 @@
         <h1 class="library-title">Library</h1>
         <span class="library-subtitle">Browse all available books</span>
       </div>
+
       <div class="search-bar">
         <span class="search-bar__icon">🔍</span>
         <input
@@ -13,19 +14,20 @@
           class="search-bar__input"
           placeholder="Search by title or author…"
           [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
         />
       </div>
     </div>
   </header>
 
-  <!-- Books grid -->
   @if (filteredBooks.length > 0) {
     <div class="books-grid">
-      @for (book of filteredBooks; track book.id) {
+      @for (book of paginatedBooks; track book.id) {
         <div class="book-card">
           <div class="book-card__cover">
             <span class="book-card__cover-letter">{{ book.title[0] }}</span>
           </div>
+
           <div class="book-card__body">
             <h3 class="book-card__title">{{ book.title }}</h3>
             <p class="book-card__author">{{ book.author }}</p>
@@ -33,12 +35,43 @@
               <span class="book-card__pages">{{ book.pages }} pages</span>
             </div>
           </div>
+
           <div class="book-card__actions">
             <button class="btn-read">Read</button>
             <button class="btn-add">+ Add to my library</button>
           </div>
         </div>
       }
+    </div>
+
+    <div class="pagination">
+      <button
+        class="pagination__btn"
+        [disabled]="currentPage === 1"
+        (click)="previousPage()"
+      >
+        Previous
+      </button>
+
+      <div class="pagination__pages">
+        @for (page of pageNumbers; track page) {
+          <button
+            class="pagination__page"
+            [class.pagination__page--active]="currentPage === page"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+      </div>
+
+      <button
+        class="pagination__btn"
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
     </div>
   }
 

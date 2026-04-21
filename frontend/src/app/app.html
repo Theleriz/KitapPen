@@ -1,11 +1,15 @@
-<nav class="navbar">
-  <span class="navbar__brand">BookTracker</span>
-  <div class="navbar__links">
-    <a routerLink="/library"      routerLinkActive="active">Library</a>
-    <a routerLink="/my-library"   routerLinkActive="active">My Library</a>
-    <a routerLink="/tracker"      routerLinkActive="active">Track Reading</a>
-    <a routerLink="/statistics"   routerLinkActive="active">Statistics</a>
-  </div>
-</nav>
+@if (showNavbar) {
+  <nav class="navbar">
+    <span class="navbar__brand">BookTracker</span>
+    <div class="navbar__links">
+      <a routerLink="/library" routerLinkActive="active">Library</a>
+      <a routerLink="/my-library" routerLinkActive="active">My Library</a>
+      <a routerLink="/tracker" routerLinkActive="active">Track Reading</a>
+      <a routerLink="/statistics" routerLinkActive="active">Statistics</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      <a routerLink="/settings" routerLinkActive="active">Settings</a>
+    </div>
+  </nav>
+}
 
 <router-outlet />

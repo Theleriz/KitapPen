@@ -74,6 +74,12 @@
         </span>
       </div>
 
+      <!-- Autostart toggle -->
+      <label class="autostart-toggle">
+        <input type="checkbox" [(ngModel)]="autostart" [disabled]="isTracking">
+        <span class="autostart-toggle__label">Autostart tracking when opening a book</span>
+      </label>
+
       <!-- Action buttons -->
       <div class="action-buttons">
         @if (!isTracking) {

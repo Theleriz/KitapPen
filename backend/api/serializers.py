@@ -1,13 +1,21 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Book, Note, ReadingSession, UserNotificationSettings
+from .models import Book, Note, ReadingSession, UserNotificationSettings, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'date_joined')
-        read_only_fields = ('id', 'date_joined')
+        fields = ('id', 'username', 'email', 'date_joined', 'role')
+        read_only_fields = ('id', 'date_joined', 'role')
+
+    def get_role(self, obj):
+        try:
+            return obj.profile.role
+        except UserProfile.DoesNotExist:
+            return 'reader'
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):

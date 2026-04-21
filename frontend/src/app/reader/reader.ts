@@ -4,6 +4,7 @@ import { forkJoin, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { BookService, Book } from '../services/book.service';
+import { TrackingSessionService } from '../services/tracking-session.service';
 
 @Component({
   selector: 'app-reader',
@@ -15,6 +16,7 @@ export class Reader implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private bookService = inject(BookService);
+  private trackingService = inject(TrackingSessionService);
 
   bookId = 0;
   book: Book | null = null;
@@ -26,6 +28,7 @@ export class Reader implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private pageChange$ = new Subject<number>();
+  private startedTracking = false;
 
   ngOnInit(): void {
     this.bookId = Number(this.route.snapshot.paramMap.get('id'));
@@ -39,7 +42,6 @@ export class Reader implements OnInit, OnDestroy {
         const lastPage = book.last_page ?? 0;
         this.currentPage = lastPage > 0 ? lastPage : 1;
 
-        // Immediately mark as started if this is the first open
         if (lastPage === 0) {
           this.bookService.updateLastPage(this.bookId, 1).subscribe();
         }
@@ -48,6 +50,13 @@ export class Reader implements OnInit, OnDestroy {
           this.pdfSrc = new Uint8Array(buf);
           this.loading = false;
         });
+
+        // Autostart tracking for this book if enabled
+        if (this.trackingService.autostart && !this.trackingService.isTracking) {
+          this.trackingService.start(this.bookId).then(ok => {
+            this.startedTracking = ok;
+          });
+        }
       },
       error: () => {
         this.error = 'Failed to load book.';
@@ -66,7 +75,6 @@ export class Reader implements OnInit, OnDestroy {
 
   onLoaded(pdf: { numPages: number }): void {
     this.totalPages = pdf.numPages;
-    // Save total_pages to DB so progress bar works in My Library
     this.bookService.updateLastPage(this.bookId, this.currentPage, pdf.numPages).subscribe();
   }
 
@@ -90,7 +98,6 @@ export class Reader implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    // Save immediately before navigating away (don't wait for debounce)
     this.bookService.updateLastPage(this.bookId, this.currentPage).subscribe();
     this.router.navigate(['/my-library']);
   }
@@ -98,5 +105,8 @@ export class Reader implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.startedTracking) {
+      this.trackingService.stop();
+    }
   }
 }
